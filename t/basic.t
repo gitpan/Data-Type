@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 6; $| = 0 }
+BEGIN { plan tests => 7; $| = 0 }
 
 use strict; use warnings;
 
@@ -9,6 +9,8 @@ use IO::Extended qw(:all);
 
 	try
 	{
+		verify( '1' , DEFINED() );
+
 			# NUM
 
 		verify( '0' , NUM( 20 ) );
@@ -53,7 +55,9 @@ use IO::Extended qw(:all);
 
 		verify( '01001001110110101' , BINARY );
 
-		verify( '0F 0C 0A' , HEX );
+		verify( '0F 0C 0A' , HEX() );
+		
+		verify( '::ffff:192.168.0.1', IP( 'v6' ) );
 
 		ok(1);
 	}
@@ -136,6 +140,17 @@ ENDE
 	try
 	{
 		verify( 'gg0F 0C 0A' , HEX );
+		
+		ok(0);
+	}
+	catch Type::Exception with
+	{
+		ok(1);
+	};
+
+	try
+	{
+		verify( '192.168.0.1', IP( 'v6' ) );
 		
 		ok(0);
 	}

@@ -4,7 +4,7 @@ Data::Type - versatile data and value types
 
 VERSION
 
-0.01.03 (Tue Jan 14 04:07:18 2003)
+0.01.04 (Tue Jan 14 13:24:28 2003)
 
 DESCRIPTION
 
@@ -152,17 +152,17 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+   I highly recommend to use CPAN for one-stop-shop installation:
+   
+   perl -MCPAN -e "install Data::Type"
+   
 
 
 TYPES and FILTERS
 
 perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
 
-Data::Type 0.01.03 supports 36 types:
+Data::Type 0.01.04 supports 39 types:
 
   BINARY                   - binary code
   BOOL                     - a true or false value
@@ -171,20 +171,23 @@ Data::Type 0.01.03 supports 36 types:
   CREDITCARD               - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
   DATE            0.01.01  - a date (mysql or Date::Parse conform)
   DATETIME                 - a date and time combination
+  DEFINED         0.01.04  - a defined (not undef) value
   DK::YESNO                - a simple answer (ja, nein)
   BIO::DNA        0.01.03  - a dna sequence
+  DOMAIN          0.01.04  - a network domain name
   EMAIL                    - an email address
   ENUM                     - a member of an enumeration
   GENDER                   - a gender male, female
   HEX                      - hexadecimal code
   INT                      - an integer
-  IP                       - an IP (V4, MAC) network address
+  IP              0.01.04  - an IP (V4, V6, MAC) network address
   ISSN            0.01.03  - an International Standard Serial Number
   LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a Locale::Language language name
+  LANGNAME        0.01.03  - a language name
   LONGTEXT                 - text with a max length of 4294967295 (2^32 - 1) characters (..
   MEDIUMTEXT               - text with a max length of 16777215 (2^24 - 1) characters (al..
   NUM                      - a number
+  PORT            0.01.04  - a network port number
   QUOTED                   - a quoted string
   REAL                     - a real
   REF                      - a reference to a variable
@@ -211,7 +214,7 @@ And 4 filters:
 TYPES BY GROUP
 
  Logic
-  BIO::CODON, BIO::DNA, BIO::RNA, LANGCODE, LANGNAME, REF
+  BIO::CODON, BIO::DNA, BIO::RNA, DEFINED, DOMAIN, EMAIL, IP, LANGCODE, LANGNAME, PORT, REF, URI
 
  Database
    Logic
@@ -234,7 +237,7 @@ TYPES BY GROUP
   BOOL, INT, NUM, REAL
 
  String
-  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+  DK::YESNO, GENDER, QUOTED, VARCHAR, WORD, YESNO
 
 
 GROUP "Database"
@@ -252,9 +255,24 @@ CONTRIBUTIONS
 The author is happy to receive more types (formats) and add to this library. If you
 have a algorithm/regex for validating it, the better. Just email me.
 
-CPAN PREREQUISITES
-It utilizes various CPAN modules as partially listed here.
-Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Business::ISSN (0.90), Business::UPC (0.02), Business::CINS (1.13), Iter (0), Date::Parse (2.23)
+PREREQUISITES
+   Class::Maker (0.05.10), 
+   Error (0.15), 
+   IO::Extended (0.05), 
+   Tie::ListKeyedHash (0.41), 
+   Iter (0)
+   
+  and for types
+   Business::ISSN 0.90 by ISSN
+   Net::IPv6Addr 0.2 by IP
+   Locale::Language 2.02 by LANGCODE, LANGNAME
+   Business::CINS 1.13 by CINS
+   Email::Valid 0.14 by EMAIL
+   Date::Parse 2.23 by DATE
+   Business::CreditCard 0.27 by CREDITCARD
+   Regexp::Common 1.20 by INT, IP, QUOTED, REAL, URI
+   Business::UPC 0.02 by UPC
+   
 
 AUTHOR
 
@@ -267,25 +285,23 @@ free software; you can redistribute it and/or modify it under the same
 terms as perl itself
 
 
-LAST CHANGES 0.01.03
-  
-  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
-  
-  * New group IType::Business (see toc).
+LAST CHANGES 0.01.04
 
+  * added dverify( ) which is die'ing instead of throwing exceptions to the people:
+  
+        dverify( $email, EMAIL ) or die $!;
+	
+  * renamed 'choice' method for Type:: types to 'param'.
+  
   * Some minor changes
-   - toc() now sorts types alphanumeretically
-   - IType:: Groups also get version
-   - added type version number to catalog() output
-
+    - Type::* package now supports new method C< sub depends {qw(CPAN::aModule)} > for retrieval of
+	a dependency tree, which type made Data::Type require what.
+	- added Data::Verify::depends() which returns a dependency list for types requiring other modules.
+	
   * New (or updated) types:
-  
-  CINS            0.01.03  - a CUSIP International Numbering System Number
-  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
-  BIO::DNA        0.01.03  - a dna sequence
-  ISSN            0.01.03  - an International Standard Serial Number
-  LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a Locale::Language language name
-  BIO::RNA        0.01.03  - a rna sequence
-  UPC             0.01.03  - standard (type-A) Universal Product Code
+
+  DEFINED         0.01.04  - a defined (not undef) value
+  DOMAIN          0.01.04  - a network domain name
+  IP              0.01.04  - an IP (V4, V6, MAC) network address
+  PORT            0.01.04  - a network port number
    

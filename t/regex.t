@@ -1,9 +1,11 @@
 use Test;
-BEGIN { plan tests => 1 }
+BEGIN { plan tests => 2 }
 
 use Data::Type qw(:all);
 use Error qw(:try);
 
+		# Regexp::Common
+		
 	try
 	{
 			# QUOTED
@@ -32,3 +34,17 @@ use Error qw(:try);
 	};
 
 
+		# Custom own Regex types
+
+	try
+	{
+		verify( '80', PORT() );
+
+		verify( 'www.cpan.org', DOMAIN() );
+
+		ok(1);
+	}
+	catch Type::Exception with
+	{
+		ok(0);
+	};

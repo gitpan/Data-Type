@@ -14,23 +14,9 @@ WriteMakefile(
 
 	IO::Extended => '0.05',
 
-	Regexp::Common => '1.20',
-
-	Email::Valid => '0.14',
-
 	Tie::ListKeyedHash => '0.41',
 
-	Business::CreditCard => '0.27',
-
-	Business::ISSN => '0.90',
-
-	Business::UPC => '0.02',
-
-	Business::CINS => '1.13',
-
 	Iter => '0',
-
-	Date::Parse => '2.23',
 
 
     },

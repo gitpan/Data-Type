@@ -71,15 +71,24 @@ Revision history for Perl extension Data::Type.
    - toc() now sorts types alphanumeretically
    - IType:: Groups also get version
    - added type version number to catalog() output
-
-  * New (or updated) types:
   
-  CINS            0.01.03  - a CUSIP International Numbering System Number
-  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
-  BIO::DNA        0.01.03  - a dna sequence
-  ISSN            0.01.03  - an International Standard Serial Number
-  LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a Locale::Language language name
-  BIO::RNA        0.01.03  - a rna sequence
-  UPC             0.01.03  - standard (type-A) Universal Product Code
+0.01.04
+
+  * added dverify( ) which is die'ing instead of throwing exceptions to the people:
+  
+        dverify( $email, EMAIL ) or die $!;
+	
+  * renamed 'choice' method for Type:: types to 'param'.
+  
+  * Some minor changes
+    - Type::* package now supports new method C< sub depends {qw(CPAN::aModule)} > for retrieval of
+	a dependency tree, which type made Data::Type require what.
+	- added Data::Verify::depends() which returns a dependency list for types requiring other modules.
+	
+  * New (or updated) types:
+
+  DEFINED         0.01.04  - a defined (not undef) value
+  DOMAIN          0.01.04  - a network domain name
+  IP              0.01.04  - an IP (V4, V6, MAC) network address
+  PORT            0.01.04  - a network port number
    

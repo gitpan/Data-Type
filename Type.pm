@@ -94,7 +94,7 @@ package Data::Type;
 
 	our @EXPORT = ();
 
-	our $VERSION = "0.01.03";
+	our $VERSION = "0.01.04";
 
 	our $DEBUG = 0;
 
@@ -186,6 +186,36 @@ package Data::Type;
 		}
 	}
 
+		# Wrapper for dying instead of throwing exceptions
+
+	sub dverify
+	{
+		my @args = @_;
+		
+		my $dead;
+		
+			try
+			{
+				verify( @_ );
+			}
+			catch Type::Exception ::with
+			{
+				my $e = shift;
+				
+				$dead = sprintf "Expected '%s' %s at %s line %s\n",
+					$e->value, 
+					$e->type->info, 
+					$e->was_file, 
+					$e->was_line;
+			};
+		
+			return 1 unless $dead;
+
+			$! = $dead;
+			
+	return undef;	
+	}
+	
 		# verify a collection of types against an object
 		
 	sub overify 
@@ -386,6 +416,32 @@ package Data::Type;
 	return $result;
 	}
 
+	sub depends
+	{
+		my %result;
+				
+		foreach my $name ( type_list() )
+		{	
+			if( "Type::${name}"->can( 'depends' ) )
+			{				
+				foreach my $mod ("Type::${name}"->depends )
+				{
+					eval "use $mod";
+	
+					die "$@ $!" if $@;
+					
+					$result{$mod}->{version} = $mod->VERSION unless exists $result{$mod}->{version};
+					
+					$result{$mod}->{types} = [] unless exists $result{$mod}->{types};
+					
+					push @{ $result{$mod}->{types} }, { name => _translate( $name ) };
+				}
+			}
+		}
+				
+	return \%result;
+	}
+
 	sub typ
 	{
 		my $type = shift;
@@ -554,6 +610,8 @@ package Regex;
 		rna => qr/[AUGC]+/,
 		
 		triplet => qr/[ATGC]{3,3}/,
+		
+		domain => qr/[a-z0-9\.-]+/,
 	};
 	
 	sub list
@@ -699,6 +757,8 @@ package Type::int;
 
 	our @ISA = qw(IType::Numeric);
 
+	sub depends { qw(Regexp::Common) }
+
 	sub info
 	{
 		my $this = shift;
@@ -734,12 +794,14 @@ package Type::num;
 
 				# Here we test the hierarchy feature -> nested types !
 
-			Type::int->test( $value );
+			Type::int->test( $Type::value );
 	}
 
 package Type::real;
 
 	our @ISA = qw(IType::Numeric);
+
+	sub depends { qw(Regexp::Common) }
 
 	sub info
 	{
@@ -757,79 +819,11 @@ package Type::real;
 			Data::Type::pass( Facet::Proxy::match( Regex::exact( $Regex::RE{num}{real} ) ) );
 	}
 
-package Type::email;
-
-	our @ISA = qw(IType::String);
-
-	sub info
-	{
-		my $this = shift;
-
-		return 'an email address';
-	}
-
-	sub test
-	{
-		my $this = shift;
-
-		$Type::value = shift;
-
-			Data::Type::pass( Facet::Proxy::email( $this->[0] ) );
-
-			#Data::Type::pass( Facet::Proxy::match( Regex::list( 'email' ) ) );
-	}
-
-package Type::uri;
-
-	our @ISA = qw(IType::String);
-
-	sub info
-	{
-		my $this = shift;
-
-		my $scheme = $this->[0] || 'http';
-
-		return sprintf 'an %s uri', $scheme;
-	}
-
-	sub test
-	{
-		my $this = shift;
-
-		$Type::value = shift;
-
-			my $scheme = $this->[0] || 'http';
-
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( $Regex::RE{URI}{HTTP}{'-scheme='.$scheme} ) ) );
-	}
-
-package Type::ip;
-
-	our @ISA = qw(IType::String);
-
-	sub info
-	{
-		my $this = shift;
-
-		return 'an IP (V4, MAC) network address';
-	}
-
-	sub test
-	{
-		my $this = shift;
-
-		$Type::value = shift;
-
-			my $format = lc( $this->[0] || 'v4' );
-
-			$format = 'IP'.$format if $format =~ /^[vV][46]$/;
-
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( $Regex::RE{net}{$format} ) ) );
-	}
-
 package Type::quoted;
 
 	our @ISA = qw(IType::String);
+
+	sub depends { qw(Regexp::Common) }
 
 	sub info
 	{
@@ -855,10 +849,10 @@ package Type::gender;
 	{
 		my $this = shift;
 
-		return sprintf 'a gender %s', join( ', ', $this->choice );
+		return sprintf 'a gender %s', join( ', ', $this->param );
 	}
 	
-	sub choice { qw(male female) }
+	sub param { qw(male female) }
 
 	sub test
 	{
@@ -866,7 +860,7 @@ package Type::gender;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::exists( [ $this->choice ] ) );
+			Data::Type::pass( Facet::Proxy::exists( [ $this->param ] ) );
 	}
 
 package Type::yesno;
@@ -877,10 +871,10 @@ package Type::yesno;
 	{	
 		my $this = shift;
 				
-		return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
+		return sprintf q{a simple answer (%s)}, join( ', ', $this->param ) ;
 	}
 
-	sub choice { qw(yes no) }
+	sub param { qw(yes no) }
 	
 	sub test
 	{
@@ -892,7 +886,7 @@ package Type::yesno;
 			
 			Filter::lc->filter( \$Type::value );
 
-			Data::Type::pass( Facet::Proxy::exists( [ $this->choice ] ) );
+			Data::Type::pass( Facet::Proxy::exists( [ $this->param ] ) );
 	}
 
 package Type::dk_yesno;
@@ -901,7 +895,7 @@ package Type::dk_yesno;
 	
 	sub export { qw(DK::YESNO) };
 		
-	sub choice { qw(ja nein) }
+	sub param { qw(ja nein) }
 
 	# HERE START THE MYSQL TYPES
 	
@@ -910,6 +904,8 @@ package Type::date;
 	our @ISA = qw(IType::DB::Mysql IType::Temporal);
 
 	our $VERSION = '0.01.01';
+	
+	sub depends { qw(Date::Parse) }
 	
 	sub info
 	{
@@ -1179,13 +1175,15 @@ package Type::enum;
 		return qq{a member of an enumeration};
 	}
 
+	sub param { { max => 65535 } }
+
 	sub test
 	{
 		my $this = shift;
 
 		$Type::value = shift;
 
-			throw Failure::Facet() if @$this > 65535;
+			throw Failure::Facet() if @$this > $this->param->{max};
 
 			Data::Type::pass( Facet::Proxy::exists( [ @$this ] ) );
 	}
@@ -1203,15 +1201,17 @@ package Type::set;
 		return qq{a set (can have a maximum of 64 members (mysql))};
 	}
 
+	sub param { { limit => 64, max => 65535 } }
+	
 	sub test
 	{
 		my $this = shift;
 
 		$Type::value = shift;
 
-			throw Failure::Facet() if @$Type::value > 64;
+			throw Failure::Facet() if @$Type::value > $this->param->{limit};
 
-			throw Failure::Facet() if @$this > 65535;
+			throw Failure::Facet() if @$this > $this->param->{max};
 
 			Data::Type::pass( Facet::Proxy::exists( [ @$this ] ) );
 	}
@@ -1248,6 +1248,8 @@ package Type::ref;
 package Type::creditcard;
 
 	our @ISA = qw(IType::Business);
+
+	sub depends { qw(Business::CreditCard) }
 
 	our $cardformats = 
 	{
@@ -1452,6 +1454,8 @@ package Type::langcode;
 	our @ISA = qw(IType::Logic);
 
 	our $VERSION = '0.01.03';
+
+	sub depends { qw(Locale::Language) }
 	
 	sub info
 	{
@@ -1484,12 +1488,14 @@ package Type::langname;
 	our @ISA = qw(IType::Logic);
 
 	our $VERSION = '0.01.03';
+
+	sub depends { qw(Locale::Language) }
 	
 	sub info
 	{
 		my $this = shift;
 
-		return qq{a Locale::Language language name};
+		return qq{a language name};
 	}
 
 	sub usage 
@@ -1515,6 +1521,8 @@ package Type::issn;
 	our @ISA = qw(IType::Business);
 
 	our $VERSION = '0.01.03';
+
+	sub depends { qw(Business::ISSN) }
 
 	sub info
 	{
@@ -1549,6 +1557,8 @@ package Type::upc;
 
 	our $VERSION = '0.01.03';
 
+	sub depends { qw(Business::UPC) }
+
 	sub info
 	{
 		my $this = shift;
@@ -1580,6 +1590,8 @@ package Type::cins;
 	our @ISA = qw(IType::Business);
 
 	our $VERSION = '0.01.03';
+
+	sub depends { qw(Business::CINS) }
 
 	sub info
 	{
@@ -1681,9 +1693,6 @@ package Type::rna;
 			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'rna' ) ) ) );
 	}
 
-	# Resource:
-	# 
-	
 package Type::codon;
 
 	our @ISA = qw(IType::Logic);
@@ -1723,6 +1732,175 @@ package Type::codon;
 			#Data::Type::verify $Type::value, Type::Proxy::rna if $kind eq 'RNA';
 			
 			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'triplet' ) ) ) );
+	}
+
+package Type::defined;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.04';
+
+	sub info
+	{
+		return qq{a defined (not undef) value};
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+			
+			Data::Type::pass( Facet::Proxy::defined() );
+	}
+
+package Type::email;
+
+	our @ISA = qw(IType::Logic);
+
+	sub depends { qw(Email::Valid) }
+
+	sub info
+	{
+		my $this = shift;
+
+		return 'an email address';
+	}
+
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Data::Type::pass( Facet::Proxy::email( $this->[0] ) );
+
+			#Data::Type::pass( Facet::Proxy::match( Regex::list( 'email' ) ) );
+	}
+
+package Type::uri;
+
+	our @ISA = qw(IType::Logic);
+
+	sub depends { qw(Regexp::Common) }
+
+	sub info
+	{
+		my $this = shift;
+
+		my $scheme = $this->[0] || 'http';
+
+		return sprintf 'an %s uri', $scheme;
+	}
+
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			my $scheme = $this->[0] || 'http';
+
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( $Regex::RE{URI}{HTTP}{'-scheme='.$scheme} ) ) );
+	}
+
+package Type::ip;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.04';
+	
+	sub depends { qw(Regexp::Common Net::IPv6Addr) }
+	
+	use Net::IPv6Addr;
+	
+	sub info
+	{
+		my $this = shift;
+
+		return 'an IP (V4, V6, MAC) network address';
+	}
+
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			my $format = lc( $this->[0] || 'v4' );
+
+			$format = 'IP'.$format if $format =~ /^[vV][46]$/;
+
+			if( $format =~ /6/ )
+			{				
+				eval
+				{
+					new Net::IPv6Addr( $Type::value );
+				};
+				
+				throw Failure::Type ( text => $@ ) if $@;
+			}
+			else
+			{
+				Data::Type::pass( Facet::Proxy::match( Regex::exact( $Regex::RE{net}{$format} ) ) );
+			}
+	}
+
+		
+package Type::domain;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.04';
+
+	sub info
+	{
+		return qq{a network domain name};
+	}
+
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+			
+			Data::Type::pass( Facet::Proxy::defined() );
+
+			Filter::lc->filter( \$Type::value );
+			
+			Data::Type::pass( Facet::Proxy::match( Regex::list( 'domain' ) ) );
+					
+			foreach my $segment ( split /\./, $Type::value ) 
+			{
+				Data::Type::pass( Facet::Proxy::match( qw/[^a-z]/ ) );	#must contain at least one alphabetical character
+				Data::Type::fail( Facet::Proxy::match( qw/^-/ ) );		#cannot start with a dash
+				Data::Type::fail( Facet::Proxy::match( qw/-$/ ) );		#cannot end with a dash
+				Data::Type::fail( Facet::Proxy::match( qw/--/ ) );		#cannot have two dashes in a row
+			}
+	}
+
+package Type::port;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.04';
+
+	sub info
+	{
+		return qq{a network port number};
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+			
+			Type::int->test( $Type::value );
+		
+			Data::Type::fail( Facet::Proxy::match( qr/^0/ ) );
+		
+			Data::Type::pass( Facet::Proxy::max( 65535 ) );
 	}
 
 	#
@@ -1916,6 +2094,24 @@ package Facet::is;
 		my $this = shift;
 
 		return sprintf 'exact %s', $this->[0];
+	}
+
+package Facet::defined;
+
+	our $VERSION = qw(0.01.04);
+	
+	sub test : method
+	{
+		my $this = shift;
+
+		throw Failure::Facet() unless defined shift;
+	}
+
+	sub info : method
+	{
+		my $this = shift;
+
+		return sprintf 'a defined (not undef) value';
 	}
 
 package Facet::bool;
@@ -2245,12 +2441,13 @@ Data::Type - versatile data and value types
 	{
 		verify $email		, EMAIL;
 		verify $homepage	, URI('http');
-		verify $server_ip	, IP('v4');
 		verify $cc			, CREDITCARD( 'MASTERCARD', 'VISA' );
 		verify $answer_a	, YESNO;
 		verify $gender		, GENDER;
 		verify 'one'		, ENUM( qw(one two three) );
 		verify [qw(two six)], SET( qw(one two three four five six) ) );
+		verify $server_ip4	, IP('v4');
+		verify $server_ip6	, IP('v6');
 
 		verify 'A35231AH1'	, CINS;
 		verify '14565935'	, ISSN;		
@@ -2266,6 +2463,7 @@ Data::Type - versatile data and value types
 		verify '01001001110110101', BINARY;
 		verify '0F 0C 0A', HEX;
 
+		verify '0'			, DEFINED;
 		verify '234'		, NUM( 20 );
 		verify '1' 			, BOOL( 'true' );
 		verify '100'		, INT;
@@ -2289,6 +2487,9 @@ Data::Type - versatile data and value types
 		verify '0' x 20		, MEDIUMTEXT;
 		verify '0' x 20		, LONGTEXT;
 		verify '0' x 20		, TEXT;
+		
+		verify '80'         , PORT;
+		verify 'www.cpan.org', DOMAIN;
 	}
 	catch Type::Exception with
 	{	
@@ -2313,7 +2514,7 @@ Data::Type - versatile data and value types
 		print $_->info;						
 		print $_->usage;					
 		print $_->export;					# does it have other names
-		print $_->choice;					# what are my choice i.e. [yes,no]
+		print $_->param;					# what are my choice i.e. [yes,no]
 		print $_->isa( 'IType::Business' ); # is it a Business related type ?
 		print $_->VERSION;					# first apperance in Data::Type release
 	}
@@ -2340,7 +2541,9 @@ Data::Type - versatile data and value types
 			$e->was_file, 
 			$e->was_line;
 	};
-		
+	   
+    dverify( $email, EMAIL ) or die $!;
+
 	my $g = Data::Type::Guard->new( 
 
 		allow => [ 'Human', 'Others' ],		# blessed objects of that type
@@ -2379,7 +2582,7 @@ data types, data manipulation, data patterns, form data, user input, tie
 
 perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
 
-Data::Type 0.01.03 supports 36 types:
+Data::Type 0.01.04 supports 39 types:
 
   BINARY                   - binary code
   BOOL                     - a true or false value
@@ -2388,20 +2591,23 @@ Data::Type 0.01.03 supports 36 types:
   CREDITCARD               - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
   DATE            0.01.01  - a date (mysql or Date::Parse conform)
   DATETIME                 - a date and time combination
+  DEFINED         0.01.04  - a defined (not undef) value
   DK::YESNO                - a simple answer (ja, nein)
   BIO::DNA        0.01.03  - a dna sequence
+  DOMAIN          0.01.04  - a network domain name
   EMAIL                    - an email address
   ENUM                     - a member of an enumeration
   GENDER                   - a gender male, female
   HEX                      - hexadecimal code
   INT                      - an integer
-  IP                       - an IP (V4, MAC) network address
+  IP              0.01.04  - an IP (V4, V6, MAC) network address
   ISSN            0.01.03  - an International Standard Serial Number
   LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a Locale::Language language name
+  LANGNAME        0.01.03  - a language name
   LONGTEXT                 - text with a max length of 4294967295 (2^32 - 1) characters (..
   MEDIUMTEXT               - text with a max length of 16777215 (2^24 - 1) characters (al..
   NUM                      - a number
+  PORT            0.01.04  - a network port number
   QUOTED                   - a quoted string
   REAL                     - a real
   REF                      - a reference to a variable
@@ -2429,7 +2635,7 @@ And 4 filters:
 =head1 TYPES BY GROUP
 
  Logic
-  BIO::CODON, BIO::DNA, BIO::RNA, LANGCODE, LANGNAME, REF
+  BIO::CODON, BIO::DNA, BIO::RNA, DEFINED, DOMAIN, EMAIL, IP, LANGCODE, LANGNAME, PORT, REF, URI
 
  Database
    Logic
@@ -2452,78 +2658,101 @@ And 4 filters:
   BOOL, INT, NUM, REAL
 
  String
-  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+  DK::YESNO, GENDER, QUOTED, VARCHAR, WORD, YESNO
 
 
 =head1 INTERFACE
 
 =head2 FUNCTIONS
 
-verify( $teststring, $type, [ .. ] ) - Verifies a 'value' against a 'type'.
+=head3 verify( $s, $type, [ .. ] )
 
-overify( { member => TYPE, .. }, $object, [ .. ] ) - Verifies members of objects against multiple 'types' or CODEREFS.
+Verifies a 'value' against (one ore more) types or facets. 
 
-=head2 Data::Type::Guard class
+=head3 dverify( $s, EMAIL ) or die $!
+
+Dies instead of throwing exceptions.
+
+=head3 overify( { member => TYPE, .. }, $object, [ .. ] )
+
+Verifys members of objects against multiple 'types' or CODEREFS.
+
+=head2 Class Data::Type::Guard
 
 This is something like a Bouncer. He inspect 'object' members for a specific type. The class has two attributes and one
 member.
 	
-=head3 'allow' attribute (Array)
+=head3 allow => $ref_array
 
 If empty isn't selective for special references (  HASH, ARRAY, "CUSTOM", .. ). If is set then "inspect" will fail if the object
 is not a reference of the listed type.
 
-=head3 'tests' attribute (Hash)
+=head3 tests => $ref_hash
 
 Keys are the members names (anything that can be called via the $o->member syntax) and the type(s) as value. When a member should
 match multple types, they should be contained in an array reference ( i.e. 'fon' => [ qw(NUM TELEPHONE) ] ).
 
-=head3 'inspect' member
+=head3 inspect( $blessed )
 
 Accepts a blessed reference as a parameter. It returns 0 if a guard test or type constrain will fail, otherwise 1.  
+In future it should return a more appropriate report what failed and what not.
 
-=head2 TYPE BINDING (via Tie)
+=head2 TYPE BINDING
 
-typ/untyp/istyp
+Tie was employed to create something strict on variables. When a variable is typ'ed, everytime it is accessed a
+type-check (verify) is applied.
 
-typ and untyp are simlar to perl's tie/untie, but they are for Data::Type's. They tie a Data::Type to a variable, so
-each time it gets assigned a new value, it gots verified if its matching the datatypes constrains.
+=head3 typ EMAIL( 1 ), \( my $typed_var, my $typed_etc, .. );
+
+EMAIL is a placeholder for any type of this library. Once an invalid value was assigned to a var an exception
+gets thrown, so place your code in a try+catch block to handle that correctly.
+
+	$typed_var = 'faked&fake.de'; # throws exception
+
+=head3 istyp( $typed_var )
+
+Because tie'd variables are obscuring themself, istyp() helps here. It reveals $typed_var 's type.
+
+	if( $what = istyp( $a ) )
+	{
+		print "a is typed to $what";
+	}
+
+=head3 untyp
+		
+Takes the typ constrains from a variable (like untie).
+
+	untyp( $alias );
 
 =head1 Exceptions
 
-Exceptions are implemented via the 'Error' module.
-
-=head2 Type::Exception
-
-This is a base class inheriting 'Error'. 
+Exceptions are implemented via the 'Error' module. Type::Exception is the base class inheriting from 'Error'
+and beeing the anchestor of any exception used within this module.
 
 =head2 Failure::Type
 
-Is a 'Type::Exception' and has following additional members:
+This exception has following members:
 
-	bool: 
-		expected	- reserved for future use 
-		returned	- reserved for future use
-	string: 
-		was_file	- the filename where the exception was thrown
-	int: 
-		was_line	- the line number
-	ref: 
-		type 		- the type 'object' used for verification
-		value		- a reference to the data given for verification against the type
+=head3 was_file	
 
-=head2 Failure::Facet (Internal use only)
+The filename where the exception was thrown.
 
-This exception is thrown in the verification process if a Facet (which is a subelement
-of the verification process) fails.
+=head3 was_line	
 
-Is a 'Type::Exception' and has following additional members.
+The line number.
 
-	bool: 
-		expected 	- reserved for future use
-		returned	- reserved for future use
-	ref: 
-		type		- the type 'object' used for verification
+=head3 type
+
+The type 'object' used for verification.
+
+=head3 value
+
+Reference to the data subjected to verification.
+
+=head2 Failure::Facet
+
+This exception is thrown in the verification process if a facet (which is a subelement
+of the verification process) fails. It is for no use, unless you are planning to create custom types.
 
 =head1 Retrieving Type Information
 
@@ -2532,43 +2761,99 @@ Is a 'Type::Exception' and has following additional members.
 returns a static string containing a listing of all know types (and a short information). This
 may be used to get an overview via:
 
-perl -e "use Data::Type qw(:all); print catalog()"
+	perl -MData::Type -e "print Data::Type::catalog()"
 
 =head2 toc()
 
-returns a string containing a grouped listing of all know types.
+Returns a static string containing a grouped listing of all know types.
+
+	perl -MData::Type -e "print Data::Type::toc()"
 
 =head2 testplan( $type )
 
-Returns the entry-objects how the type is verified. This may be used to create a textual description how a type is verified.
+Returns the entry-objects how the type is verified. This may be used to create a textual description 
+how the type verification process is driven. This could give clues to a web user, when he should get
+an error report, how his form submission would accepted.
  
+=head3 depends()
+
+Type:: package supports a method C<sub depends {qw(CPAN::aModule)}>. It helps building a dependency tree
+classified for types. This function an an array reference, like this example:
+
+	[
+		{
+		'module' => 'Net::IPv6Addr',
+		'version' => '0.2',
+		'types' => [
+						{
+						'name' => 'IP'
+						}
+					]
+		},
+		{
+		'module' => 'Locale::Language',
+		'version' => '2.02',
+		'types' => [
+						{
+						'name' => 'LANGCODE'
+						},
+						{
+						'name' => 'LANGNAME'
+						}
+					],
+		},
+	];
+	   
+Note: This can be easily stuffed into HTML::Template's loops or in future helps implementing clever 
+runtime module loading for only types really used.
+
 =head2 EXPORT
 
-all = (typ untyp istyp verify catalog testplan), map { uc } @types
+all = (typ untyp istyp verify catalog testplan toc), map { uc } @types
 
 None by default.
 
-=head2 LAST CHANGES 0.01.03
-  
-  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
-  
-  * New group IType::Business (see toc).
+=head2 PREREQUISITES
 
+=head3 Standard
+   Class::Maker (0.05.10), 
+   Error (0.15), 
+   IO::Extended (0.05), 
+   Tie::ListKeyedHash (0.41), 
+   Iter (0)
+   
+=head3 And for types
+
+   Business::ISSN 0.90 by ISSN
+   Net::IPv6Addr 0.2 by IP
+   Locale::Language 2.02 by LANGCODE, LANGNAME
+   Business::CINS 1.13 by CINS
+   Email::Valid 0.14 by EMAIL
+   Date::Parse 2.23 by DATE
+   Business::CreditCard 0.27 by CREDITCARD
+   Regexp::Common 1.20 by INT, IP, QUOTED, REAL, URI
+   Business::UPC 0.02 by UPC
+   
+
+=head2 LAST CHANGES 0.01.04
+
+  * added dverify( ) which is die'ing instead of throwing exceptions to the people:
+  
+        dverify( $email, EMAIL ) or die $!;
+	
+  * renamed 'choice' method for Type:: types to 'param'.
+  
   * Some minor changes
-   - toc() now sorts types alphanumeretically
-   - IType:: Groups also get version
-   - added type version number to catalog() output
-
+    - Type::* package now supports new method C< sub depends {qw(CPAN::aModule)} > for retrieval of
+	a dependency tree, which type made Data::Type require what.
+	- added Data::Verify::depends() which returns a dependency list for types requiring other modules.
+	
   * New (or updated) types:
-  
-  CINS            0.01.03  - a CUSIP International Numbering System Number
-  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
-  BIO::DNA        0.01.03  - a dna sequence
-  ISSN            0.01.03  - an International Standard Serial Number
-  LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a Locale::Language language name
-  BIO::RNA        0.01.03  - a rna sequence
-  UPC             0.01.03  - standard (type-A) Universal Product Code
+
+  DEFINED         0.01.04  - a defined (not undef) value
+  DOMAIN          0.01.04  - a network domain name
+  IP              0.01.04  - an IP (V4, V6, MAC) network address
+  PORT            0.01.04  - a network port number
    
 
 =head1 AUTHOR

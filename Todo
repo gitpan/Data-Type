@@ -7,7 +7,7 @@ todo
 todo
 {
 	- Implement decision table for bouncer-like (bouncer is far too simple for the new possibilities)
-	scenarios.
+	scenarios. This can be done via Decision::Table after Data::Type::Guard gave us his opinion.
 }
 
 todo
@@ -145,7 +145,12 @@ bug
 todo( DOCU )
 {
 	Write Tutorial/FAQ
-	  'How to add new types' or 'How to add my custom types'
+	  * 'How to add new types' or 'How to add my custom types'
+	  * How could i use D::T to assure valid function parameters
+	    - with Params::Validate
+		
+		  validate( @_, { foo => { type => REF( 'ARRAY' ) } );
+
 }
 
 todo
@@ -156,4 +161,11 @@ todo
 todo
 {
 	recognize new types via their VERSION in release.pl, so we could place them via templates
+}
+done
+
+todo
+{
+	_translate should really translate "back and forth" type pkgname <> imported name (respecting
+	export).
 }
