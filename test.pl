@@ -47,7 +47,7 @@ ok(1); # If we made it this far, we're ok.
 
 	Data::Type::println "=" x 100;
 
-	foreach my $type ( URI, EMAIL, IP( 'V4' ), VARCHAR(80) )
+	foreach my $type ( URI, EMAIL, IP( 'V4' ), VARCHAR(80), YESNO )
 	{
 		Data::Type::println "\n" x 2, "Describing ", $type->info;
 
@@ -58,3 +58,5 @@ ok(1); # If we made it this far, we're ok.
 	}
 
 	print "\n", CREDITCARD()->usage, "\n";
+
+	print "\n", DK::YESNO()->info, "\n";	

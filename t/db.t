@@ -18,7 +18,7 @@ use Error qw(:try);
 
 			# MYSQL types
 
-		verify( '2001-01-01', DATE );
+		verify( '2001-01-01', DATE( 'MYSQL' ) );
 
 		verify( '9999-12-31 23:59:59', DATETIME );
 

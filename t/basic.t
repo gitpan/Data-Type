@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 5; $| = 0 }
+BEGIN { plan tests => 6; $| = 0 }
 
 use strict; use warnings;
 
@@ -55,6 +55,38 @@ use IO::Extended qw(:all);
 
 		verify( '0F 0C 0A' , HEX );
 
+		ok(1);
+	}
+	catch Type::Exception with
+	{
+		ok(0);
+		
+		use Data::Dumper;
+		
+		print Dumper shift;
+	};
+
+	# Date::Parse 2.23 example parse dates 
+my $dates = <<ENDE;
+1995:01:24T09:08:17.1823213
+1995-01-24T09:08:17.1823213
+Wed, 16 Jun 94 07:29:35 CST
+Thu, 13 Oct 94 10:13:13 -0700
+Wed, 9 Nov 1994 09:50:32 -0500 (EST)
+21 dec 17:05
+21-dec 17:05
+21/dec 17:05
+21/dec/93 17:05
+1999 10:02:18 "GMT"
+16 Nov 94 22:28:20 PST
+ENDE
+
+	my @dates = split /\n/, $dates;
+
+	try
+	{
+		verify( $_, DATE( 'DATEPARSE' ) ) for @dates;
+		
 		ok(1);
 	}
 	catch Type::Exception with

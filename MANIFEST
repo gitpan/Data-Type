@@ -6,10 +6,11 @@ Todo
 test.pl
 Type.pm
 t/basic.t
-t/describe.t
-t/guard.t
 t/email_valid.t
+t/regexp_common.t
 t/creditcard.t
 t/db.t
-t/regexp_common.t
-
+t/describe.t
+t/facets.t
+t/guard.t
+t/typ.t

@@ -24,6 +24,8 @@ WriteMakefile(
 
 	Iter => '0',
 
+	Date::Parse => '2.23',
+
 
     },
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

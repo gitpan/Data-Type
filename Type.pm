@@ -34,7 +34,7 @@ package Type::Exception;
 				delete $args{$key};
 			}
 		}
-
+		
 		return $class->SUPER::new( %super_args );
 	}
 
@@ -92,7 +92,7 @@ package Data::Type;
 
 	our @EXPORT = ();
 
-	our $VERSION = "0.01.01";
+	our $VERSION = "0.01.02";
 
 	our $DEBUG = 0;
 
@@ -243,6 +243,8 @@ package Data::Type;
 		return @Data::Type::_history;
 	}
 
+		# carefull: names beginning with _ are ignored !
+		
 	sub _grasp_sym_list
 	{
         my $pk = shift or die;
@@ -274,8 +276,12 @@ package Data::Type;
 		$result .= sprintf __PACKAGE__." $VERSION supports %d types:\n\n", scalar @types;
 				
 		foreach my $name ( sort { $a cmp $b } @types )
-		{
-			$result .= sprintf "%s%-18s - %s\n", " " x 2, uc $name, strlimit( ( bless [], "Type::${name}" )->info(  ) );
+		{						
+			$result .= sprintf "%s%-18s - %s\n", " " x 2, 
+				
+				"Type::${name}"->can( 'export' ) ? join( ', ', "Type::${name}"->export ) : _translate( $name ), 
+				
+				strlimit( ( bless [], "Type::${name}" )->info(  ) );
 		}
 
 		@types = filter_list();
@@ -284,7 +290,7 @@ package Data::Type;
 
 		foreach my $name ( @types )
 		{
-			$result .= sprintf "  %-18s - %s\n", $name, strlimit( ( bless [], "Filter::${name}" )->info(  ) );
+			$result .= sprintf "  %-18s - %s\n", _translate( $name ), strlimit( ( bless [], "Filter::${name}" )->info(  ) );
 		}
 		
 		return $result;
@@ -328,6 +334,22 @@ package Data::Type;
 	return $result;
 	}
 
+	sub _unique_ordered
+	{
+		my $prev = shift;
+			
+		my @result = ( $prev );
+				
+		for ( iter \@_ )
+		{			
+			push @result, VALUE() if VALUE() ne $prev;
+			
+			$prev = $_;
+		}
+		
+	return @result;
+	}
+	
 	sub toc
 	{
 		my @types = type_list();
@@ -339,14 +361,20 @@ package Data::Type;
 		tie my %tied_hash, 'Tie::ListKeyedHash';
 		
 		foreach my $name ( @types )
-		{
-			my @isa = @{ "Type::${name}::ISA" };
-				
-			my $special_key = [ map { $_->info || die 'cannot retrieve info for '.$_ } @isa ];
+		{						
+			my @isa = _unique_ordered @{ Class::Maker::Reflection::inheritance_isa( @{ "Type::${name}::ISA" } ) };
+										
+			my $special_key = [ _unique_ordered map { $_->can( 'desc' ) ?  $_->desc : () } @isa ];
 						
 			$tied_hash{ $special_key } = [] unless exists $tied_hash{ $special_key };
-			
-			push @{ $tied_hash{ $special_key } }, sprintf( '%s', uc $name );
+										 
+			push @{ $tied_hash{ $special_key } }, 
+				
+				sprintf( '%s', 
+						
+						"Type::${name}"->can( 'export' ) ? join( ', ', "Type::${name}"->export ) : _translate( $name )
+						
+				);
 		}
 		
 		$result .= _show_list \%tied_hash;
@@ -424,26 +452,55 @@ package Data::Type;
 			#
 			# Note that codegen is called above
 
+	sub _translate
+	{
+		return uc shift;
+	}
+	
+	sub _export
+	{
+		my $what = shift;
+
+		foreach my $where ( @_ )
+		{
+			warn "exporting $what to $where" if $DEBUG;
+			
+			println sprintf "sub %s { Type::Proxy::%s( \@_ ); };", _translate( $where ), _translate( $what ) if $DEBUG;
+	
+			eval sprintf "sub %s { Type::Proxy::%s( \@_ ); };", _translate( $where ), _translate( $what );
+	
+			warn $@ if $@;
+		}
+	}
+	
 	sub codegen
 	{
+		my @aliases;
+		
 		foreach my $type ( Data::Type::type_list() )
 		{
 			println $type if $DEBUG;
 
-			println sprintf "sub %s { Type::Proxy::%s( \@_ ); };", uc $type, uc $type if $DEBUG;
-
-			eval sprintf "sub %s { Type::Proxy::%s( \@_ ); };", uc $type, uc $type;
-
-			warn $@ if $@;
+			my $type_pkg = "Type::${type}";
+			
+			warn "$type_pkg can( 'export' ) ? ", $type_pkg->can( 'export' ) ? 'yes' : 'no' if $DEBUG;
+			
+			_export( $type, $type_pkg->can( 'export' ) ?  $type_pkg->export : _translate( $type ) );
+			 
+			push @aliases, $type_pkg->can( 'export' ) ?  $type_pkg->export : _translate( $type );
 		}
 
-		println sprintf "use subs qw(%s);", uc( join ' ', Data::Type::type_list() ) if $DEBUG;
+		println sprintf "use subs qw(%s);", join ' ', @aliases if $DEBUG;
 
-		eval sprintf "use subs qw(%s);", uc( join ' ', Data::Type::type_list() );
+		eval sprintf "use subs qw(%s);", join ' ', @aliases;
 
 		warn $@ if $@;
 	}
 
+package Data::Type::Locale;
+
+	# add localization stuff here
+	
 package Type::Proxy;
 
 	use vars qw($AUTOLOAD);
@@ -457,11 +514,43 @@ package Type::Proxy;
 
 package Regex;
 
-		use Regexp::Common;
+	use Regexp::Common;
 
+	use Carp;
+	
 	sub exact
 	{
 		return '^'.$_[0].'$';
+	}
+		
+	our $LIST =
+	{
+		word => qr/[^\s]+/,
+		
+		mysql_date => qr/\d{4}-[01]\d-[0-3]\d/,
+		
+		mysql_datetime => qr/\d{4}-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/,
+		
+		mysql_timestamp => qr/[1-2][9|0][7-9,0-3][0-7]-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/,
+		
+		mysql_time => qr/-?\d{3,3}:[0-6]\d:[0-6]\d/,
+		
+		mysql_year4 => qr/[0-2][9,0,1]\d\d/,
+		
+		mysql_year2 => qr/\d{2,2}/,
+		
+		binary => qr/[01]+/,
+		
+		hex => qr/[0-9a-fA-F]+/,
+		
+		email => qr/(?:[^\@]*)\@(?:\w+)(?:\.\w+)+/,	# not used 
+	};
+	
+	sub list
+	{
+		return $LIST->{$_[0]} if exists $LIST->{$_[0]};
+		
+		carp "Unknown $_[0] Regex::list regex requested";
 	}
 
 package Type;
@@ -489,37 +578,37 @@ package IType::Numeric;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'Numeric' }
+	sub desc { 'Numeric' }
 	
 package IType::Temporal;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'Time or Date related' }
+	sub desc { 'Time or Date related' }
 
 package IType::String;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'String' }
+	sub desc { 'String' }
 
 package IType::Logic;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'Logic' }
+	sub desc { 'Logic' }
 
 package IType::DB::Mysql;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'Database' }
+	sub desc { 'Database' }
 
 package IType::W3C;
 
 	our @ISA = qw(IType::UNIVERSAL);
 
-	sub info { 'W3C' }
+	sub desc { 'W3C' }
 
 package Type::varchar;
 
@@ -558,7 +647,7 @@ package Type::word;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::match( qr/[^\s]+/ ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::list( 'word' ) ) );
 	}
 
 package Type::bool;
@@ -669,7 +758,7 @@ package Type::email;
 
 			Data::Type::pass( Facet::Proxy::email( $this->[0] ) );
 
-			#Data::Type::pass( Facet::Proxy::match( qr/(?:[^\@]*)\@(?:\w+)(?:\.\w+)+/ ) );
+			#Data::Type::pass( Facet::Proxy::match( Regex::list( 'email' ) ) );
 	}
 
 package Type::uri;
@@ -748,8 +837,10 @@ package Type::gender;
 	{
 		my $this = shift;
 
-		return 'a gender (male|female)';
+		return sprintf 'a gender %s', join( ', ', $this->choice );
 	}
+	
+	sub choice { qw(male female) }
 
 	sub test
 	{
@@ -757,20 +848,22 @@ package Type::gender;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::exists( [qw(male female)] ) );
+			Data::Type::pass( Facet::Proxy::exists( [ $this->choice ] ) );
 	}
 
 package Type::yesno;
 
 	our @ISA = qw(IType::String);
 
-	sub info
-	{
+	sub info 
+	{	
 		my $this = shift;
-
-		return 'a simple answer (yes|no)';
+				
+		return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
 	}
 
+	sub choice { qw(yes no) }
+	
 	sub test
 	{
 		my $this = shift;
@@ -781,8 +874,16 @@ package Type::yesno;
 			
 			Filter::lc->filter( \$Type::value );
 
-			Data::Type::pass( Facet::Proxy::exists( [qw(yes no)] ) );
+			Data::Type::pass( Facet::Proxy::exists( [ $this->choice ] ) );
 	}
+
+package Type::dk_yesno;
+
+	our @ISA = qw(Type::yesno);
+	
+	sub export { qw(DK::YESNO) };
+		
+	sub choice { qw(ja nein) }
 
 	# HERE START THE MYSQL TYPES
 	
@@ -790,22 +891,71 @@ package Type::date;
 
 	our @ISA = qw(IType::DB::Mysql IType::Temporal);
 
+	our $VERSION = '0.01.01';
+	
 	sub info
 	{
 		my $this = shift;
 
 			#The supported range is '1000-01-01' to '9999-12-31' (mysql)
 
-		return "a date";
+		return 'a date (mysql or Date::Parse conform)';
 	}
 
+	sub usage 
+	{
+		my $this = shift;
+		
+		return <<ENDE;
+DATE( [ 'MYSQL','DATEPARSE' ] ) MYSQL is mysql's builtin data type behaviour 
+and DATAPARSE employs Data::Parse's str2time function. Filtered by: chomp.
+ENDE
+	}
+	
+	our $supported = { mysql => 1, dateparse => 1 };
+	
 	sub test
 	{
 		my $this = shift;
 
 		$Type::value = shift;
+		
+		my $format = 'mysql';
+		
+			$format = $this->[0] if @$this;
 
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/\d{4}-[01]\d-[0-3]\d/ ) ) );
+			$format = lc $format;
+
+			my @back = caller(1);
+						
+			throw Failure::Type( 
+				
+				text => "unknown ".__PACKAGE__." argument '$format'",
+				
+				value => $Type::value, type => __PACKAGE__, was_file => $back[1], was_line => $back[2] 
+				
+				) unless exists $supported->{$format};
+
+			Filter::chomp->filter( \$Type::value );
+	
+			if( $format eq 'mysql' )
+			{
+				Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_date' ) ) ) );
+			}
+			elsif( $format eq 'dateparse' )
+			{
+				use Date::Parse;
+	
+				#Date::Parse->language('German');
+										
+				throw Failure::Type( 
+					
+					text => 'is not a Date::Parse date',
+					
+					value => $Type::value, type => __PACKAGE__, was_file => $back[1], was_line => $back[2] 
+					
+					) unless str2time( $Type::value );
+			}
 	}
 
 package Type::datetime;
@@ -818,7 +968,7 @@ package Type::datetime;
 
 			 #The supported range is '1000-01-01 00:00:00' to '9999-12-31 23:59:59' (mysql)
 
-		return "a date and time combination";
+		return 'a date and time combination';
 	}
 
 	sub test
@@ -827,7 +977,7 @@ package Type::datetime;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/\d{4}-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/ ) ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_datetime' ) ) ) );
 	}
 
 package Type::timestamp;
@@ -838,18 +988,21 @@ package Type::timestamp;
 	{
 		my $this = shift;
 
-			#The range is '1970-01-01 00:00:00' to sometime in the year 2037 (mysql)
-
-		return "a timestamp";
+		return 'a timestamp (mysql)';
 	}
 
+	sub usage 
+	{
+		return q{The range is '1970-01-01 00:00:00' to sometime in the year 2037 (mysql)};
+	}
+	
 	sub test
 	{
 		my $this = shift;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/[1-2][9|0][7-9,0-3][0-7]-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/ ) ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_timestamp' ) ) ) );
 	}
 
 package Type::time;
@@ -860,18 +1013,21 @@ package Type::time;
 	{
 		my $this = shift;
 
-			#The range is '-838:59:59' to '838:59:59' (mysql)
-
-		return "a time";
+		return 'a time (mysql)';
 	}
 
+	sub usage
+	{
+		return q{The range is '-838:59:59' to '838:59:59' (mysql)};
+	}
+	
 	sub test
 	{
 		my $this = shift;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/-?\d{3,3}:[0-6]\d:[0-6]\d/ ) ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_time' ) ) ) );
 	}
 
 package Type::year;
@@ -882,9 +1038,12 @@ package Type::year;
 	{
 		my $this = shift;
 
-			#The allowable values are 1901 to 2155, 0000 in the 4-digit year format, and 1970-2069 if you use the 2-digit format (70-69) (default is 4-digit)
-
-		return "a year in 2- or 4-digit format";
+		return 'a year in 2- or 4-digit format';
+	}
+	
+	sub usage 
+	{
+		return 	'The allowable values are 1901 to 2155, 0000 in the 4-digit year format, and 1970-2069 if you use the 2-digit format (70-69) (default is 4-digit)';
 	}
 
 	sub test
@@ -899,13 +1058,13 @@ package Type::year;
 			{
 					#1970-2069 if you use the 2-digit format (70-69);
 
-				Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/\d{2,2}/ ) ) );
+				Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_year2' ) ) ) );
 			}
 			else
 			{
 					#The allowable values are 1901 to 2155, 0000 in the 4-digit
 
-				Data::Type::pass( Facet::Proxy::match( Regex::exact( qr/[0-2][9,0,1]\d\d/ ) ) );
+				Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'mysql_year4' ) ) ) );
 			}
 	}
 
@@ -1230,7 +1389,7 @@ package Type::binary;
 	sub usage 
 	{
 		
-	return '([01])';
+	return 'Set of ( [0|1] )';
 	}
 	
 	sub test
@@ -1239,7 +1398,7 @@ package Type::binary;
 
 		$Type::value = shift;
 
-			Data::Type::pass( Facet::Proxy::match( qr/^[01]+$/ ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'binary' ) ) ) );
 	}
 
 package Type::hex;
@@ -1256,7 +1415,7 @@ package Type::hex;
 	sub usage 
 	{
 		
-	return '([0-9a-fA-F])';
+	return 'Set of ( ([0-9a-fA-F]) )';
 	}
 	
 	sub test
@@ -1267,7 +1426,7 @@ package Type::hex;
 
 			Filter::strip->filter( \$Type::value, '\s' );
 
-			Data::Type::pass( Facet::Proxy::match( qr/^[0-9a-fA-F]+$/ ) );
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'hex' ) ) ) );
 	}
 
 	#
@@ -1538,6 +1697,8 @@ package Facet::exists;
 
 package Facet::mod10check;
 
+	# could have used Algorithm::LUHN
+	
 	use Business::CreditCard;
 
 	sub test : method
@@ -1546,9 +1707,7 @@ package Facet::mod10check;
 
 		my $val = shift;
 
-		# throw Failure::Facet() unless mod10check( $val );
-
-			# We use Business::CreditCard's mod10 routine
+			# We use Business::CreditCard's mod10 luhn
 			
 		throw Failure::Facet() unless validate( $val );
 	}
@@ -1560,62 +1719,6 @@ package Facet::mod10check;
 		return 'LUHN formula (mod 10) for validation of creditcards';
 	}
 	
-	# The following steps are required to validate the primary
-	# account number:
-	#
-	# Step 1:   Double the value of alternate digits of the primary
-	#			account number beginning with the second digit from
-	#			the right (the first right--hand digit is the
-	#			checkdigit.)
-	#
-	# Step 2:   Add the individual digits comprising the products
-	#			obtained in Step 1 to each of the unaffected digits
-	#			in the original number.
-	#
-	# Step 3:   The total obtained in Step 2 must be a number ending
-	#			in zero (30, 40, 50, etc.) for the account number
-	#			to be validated.
-				
-	sub mod10check($)
-	{
-		my $Number = shift;
-	
-		$Number =~ tr/[!0-9]//cd;
-	
-		my ( $NumberLength, $Location, $Checksum, $Digit ) = ( length($Number), 0, 0, '' );
-	
-			# Add even digits in even length strings
-			# or odd digits in odd length strings.
-		
-			# checke jede zweite zahl 
-		
-		for( $Location = 1 - ($NumberLength % 2); $Location < $NumberLength; $Location += 2 )
-		{
-			$Checksum += substr($Number, $Location, 1);
-		}
-	
-			# Analyze odd digits in even length strings
-			# or even digits in odd length strings.
-
-		for( $Location = ($NumberLength % 2); $Location < $NumberLength; $Location += 2 )
-		{
-			$Digit = substr($Number, $Location, 1) * 2;
-			
-			if ($Digit < 10)
-			{
-				$Checksum += $Digit;
-			}
-			else
-			{
-				$Checksum += $Digit - 9;
-			}
-		}
-	
-		# Is the checksum divisible by 10?
-		
-	return ($Checksum % 10 == 0);
-	}
-
 package Filter;
 
 	sub filter : method
@@ -1834,8 +1937,8 @@ Data::Type - versatile data/type verification, validation and testing
 
 =head1 SYNOPSIS
 
-use Data::Type qw(:all);
-use Error qw(:try);
+	use Data::Type qw(:all);
+	use Error qw(:try);
 
 	# EMAIL, URI, IP('V4') are standard types
 	
@@ -1886,16 +1989,17 @@ data types, data manipulation, data patterns, form data, user input, tie
 
 perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
 
-Data::Type 0.01.01 supports 27 types:
+Data::Type 0.01.02 supports 28 types:
 
   BINARY             - binary code
   BOOL               - a true or false value
   CREDITCARD         - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
-  DATE               - a date
+  DATE               - a date (mysql or Date::Parse conform)
   DATETIME           - a date and time combination
+  DK::YESNO          - a simple answer (mand, kvinde)
   EMAIL              - an email address
   ENUM               - a member of an enumeration
-  GENDER             - a gender (male|female)
+  GENDER             - a gender male, female
   HEX                - hexadecimal code
   INT                - an integer
   IP                 - an IP (V4, MAC) network address
@@ -1907,21 +2011,21 @@ Data::Type 0.01.01 supports 27 types:
   REF                - a reference to a variable
   SET                - a set (can have a maximum of 64 members (mysql))
   TEXT               - blob with a max length of 65535 (2^16 - 1) characters (alias..
-  TIME               - a time
-  TIMESTAMP          - a timestamp
+  TIME               - a time (mysql)
+  TIMESTAMP          - a timestamp (mysql)
   TINYTEXT           - text with a max length of 255 (2^8 - 1) characters (alias my..
   URI                - an http uri
   VARCHAR            - a string with limited length of choice (default 60)
   WORD               - a word (without spaces)
   YEAR               - a year in 2- or 4-digit format
-  YESNO              - a simple answer (yes|no)
+  YESNO              - a simple answer (yes, no)
 
 And 4 filters:
 
-  chomp              - chomps
-  lc                 - lower cases
-  strip              - strip
-  uc                 - upper cases
+  CHOMP              - chomps
+  LC                 - lower cases
+  STRIP              - strip
+  UC                 - upper cases
 
 
 =head1 GROUPED TYPES TOC
@@ -1947,7 +2051,7 @@ And 4 filters:
   BOOL, INT, NUM, REAL
 
  String
-  EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
 
 
 =head1 INTERFACE
@@ -1977,26 +2081,29 @@ match multple types, they should be contained in an array reference ( i.e. 'fon'
 
 Accepts a blessed reference as a parameter. It returns 0 if a guard test or type constrain will fail, otherwise 1.  
 
-=head2 TYPE BINDING
+=head2 TYPE BINDING (via Tie)
 
 typ/untyp/istyp
 
+typ and untyp are simlar to perl's tie/untie, but they are for Data::Type's. They tie a Data::Type to a variable, so
+each time it gets assigned a new value, it gots verified if its matching the datatypes constrains.
+
 =head3 Example	
 
-try
-{
-	typ ENUM( qw(Murat mo muri) ), \( my $alias );
-
-	$alias = 'Murat';
-
-	$alias = 'mo';
-
-	$alias = 'XXX';
-}
-catch Type::Exception ::with
-{
-	printf "Expected '%s' %s at %s line %s\n", $_->value, $_->type->info, $_->was_file, $_->was_line foreach @_;
-};
+	try
+	{
+		typ ENUM( qw(Murat mo muri) ), \( my $alias );
+	
+		$alias = 'Murat';
+	
+		$alias = 'mo';
+	
+		$alias = 'XXX';
+	}
+	catch Type::Exception ::with
+	{
+		printf "Expected '%s' %s at %s line %s\n", $_->value, $_->type->info, $_->was_file, $_->was_line foreach @_;
+	};
 
 =head1 Exceptions
 
@@ -2053,7 +2160,7 @@ Returns the entry-objects how the type is verified. This may be used to create a
  
 		foreach my $entry ( testplan( $type ) )
 		{
-			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', strlimit( $entry->[0]->info() );
+			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', $entry->[0]->info();
 		}
 
 =head2 EXPORT
@@ -2062,16 +2169,52 @@ all = (typ untyp istyp verify catalog testplan), map { uc } @types
 
 None by default.
 
-=head2 LAST CHANGES 0.01.01
+=head2 LAST CHANGES 0.01.02
 
-  Migrated from 'Data::Verify' to 'Data::Type' namespace
-  Removed the pre-alpha disclaimer from README
-  This now is alpha software
+  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
+    posted by Henrik Tougaard via RT
 
-  added IType::W3C Interface where types from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/ are implemented
-  changed 'Function' namespace to 'Facet' conforming w3c
+    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
+	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
+	- Introduced locale support (added empty package Data::Type::Locale)
+	- separated localizable type parameters to methods, so they are overridable through inheriting
+	localized types:
+	
+	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
+
+	{
+	package Type::yesno;
+
+		our @ISA = qw(IType::String);
+	
+		sub info 
+		{	
+			my $this = shift;
+					
+			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
+		}
+	
+		sub choice { qw(yes no) }
+	
+	package Type::dk_yesno;
+
+		our @ISA = qw(Type::yesno);
+		
+		sub export { qw(DK::YESNO) };
+			
+		sub choice { qw(mand kvinde) }
+	}
+	
+  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
+	
+  * Types now have their own $VERSION
   
-  added HEX, BINARY types
+  * Some minor changes
+    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
+      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
+    - toc() now lists also export alias's
+    - regex's are now centralized and accessible via Regex::list( 'key' );
+	
 
 =head1 AUTHOR
 
@@ -2082,5 +2225,5 @@ Murat Ünalan, <murat.uenalan@cpan.org>
 http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/
 
 Data::Types, String::Checker, Regexp::Common, Data::FormValidator, HTML::FormValidator, CGI::FormMagick::Validator, CGI::Validate,
-Email::Valid::Loose, Embperl::Form::Validate, Attribute::Types
+Email::Valid::Loose, Embperl::Form::Validate, Attribute::Types, String::Pattern, Class::Tangram
 

@@ -14,3 +14,50 @@ Revision history for Perl extension Data::Type.
   changed 'Function' namespace to 'Facet' conforming w3c
   
   added HEX, BINARY types
+
+0.01.02
+
+  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
+    posted by Henrik Tougaard via RT
+
+    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
+	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
+	- Introduced locale support (added empty package Data::Type::Locale)
+	- separated localizable type parameters to methods, so they are overridable through inheriting
+	localized types:
+	
+	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
+
+	{
+	package Type::yesno;
+
+		our @ISA = qw(IType::String);
+	
+		sub info 
+		{	
+			my $this = shift;
+					
+			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
+		}
+	
+		sub choice { qw(yes no) }
+	
+	package Type::dk_yesno;
+
+		our @ISA = qw(Type::yesno);
+		
+		sub export { qw(DK::YESNO) };
+			
+		sub choice { qw(mand kvinde) }
+	}
+	
+  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
+	
+  * Types now have their own $VERSION
+  
+  * Some minor changes
+    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
+      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
+    - toc() now lists also export alias's
+    - regex's are now centralized and accessible via Regex::list( 'key' );
+	

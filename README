@@ -4,7 +4,7 @@ Data::Type - versatile data/type verification, validation and testing
 
 VERSION
 
-0.01.01 (Tue Jan  7 23:27:21 2003)
+0.01.02 (Sun Jan 12 08:00:30 2003)
 
 DESCRIPTION
 
@@ -18,16 +18,17 @@ TYPES and FILTERS
 
 perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
 
-Data::Type 0.01.01 supports 27 types:
+Data::Type 0.01.02 supports 28 types:
 
   BINARY             - binary code
   BOOL               - a true or false value
   CREDITCARD         - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
-  DATE               - a date
+  DATE               - a date (mysql or Date::Parse conform)
   DATETIME           - a date and time combination
+  DK::YESNO          - a simple answer (mand, kvinde)
   EMAIL              - an email address
   ENUM               - a member of an enumeration
-  GENDER             - a gender (male|female)
+  GENDER             - a gender male, female
   HEX                - hexadecimal code
   INT                - an integer
   IP                 - an IP (V4, MAC) network address
@@ -39,21 +40,21 @@ Data::Type 0.01.01 supports 27 types:
   REF                - a reference to a variable
   SET                - a set (can have a maximum of 64 members (mysql))
   TEXT               - blob with a max length of 65535 (2^16 - 1) characters (alias..
-  TIME               - a time
-  TIMESTAMP          - a timestamp
+  TIME               - a time (mysql)
+  TIMESTAMP          - a timestamp (mysql)
   TINYTEXT           - text with a max length of 255 (2^8 - 1) characters (alias my..
   URI                - an http uri
   VARCHAR            - a string with limited length of choice (default 60)
   WORD               - a word (without spaces)
   YEAR               - a year in 2- or 4-digit format
-  YESNO              - a simple answer (yes|no)
+  YESNO              - a simple answer (yes, no)
 
 And 4 filters:
 
-  chomp              - chomps
-  lc                 - lower cases
-  strip              - strip
-  uc                 - upper cases
+  CHOMP              - chomps
+  LC                 - lower cases
+  STRIP              - strip
+  UC                 - upper cases
 
 GROUPED TOC
 
@@ -78,7 +79,7 @@ GROUPED TOC
   BOOL, INT, NUM, REAL
 
  String
-  EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
 
 
 GROUP Database
@@ -124,7 +125,7 @@ To install this module type the following:
 
 
 CPAN PREREQUISITES
-Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Iter (0)
+Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Iter (0), Date::Parse (2.23)
 
 CONTRIBUTIONS
 
@@ -142,13 +143,49 @@ free software; you can redistribute it and/or modify it under the same
 terms as perl itself
 
 
-LAST CHANGES 0.01.01
+LAST CHANGES 0.01.02
 
-  Migrated from 'Data::Verify' to 'Data::Type' namespace
-  Removed the pre-alpha disclaimer from README
-  This now is alpha software
+  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
+    posted by Henrik Tougaard via RT
 
-  added IType::W3C Interface where types from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/ are implemented
-  changed 'Function' namespace to 'Facet' conforming w3c
+    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
+	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
+	- Introduced locale support (added empty package Data::Type::Locale)
+	- separated localizable type parameters to methods, so they are overridable through inheriting
+	localized types:
+	
+	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
+
+	{
+	package Type::yesno;
+
+		our @ISA = qw(IType::String);
+	
+		sub info 
+		{	
+			my $this = shift;
+					
+			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
+		}
+	
+		sub choice { qw(yes no) }
+	
+	package Type::dk_yesno;
+
+		our @ISA = qw(Type::yesno);
+		
+		sub export { qw(DK::YESNO) };
+			
+		sub choice { qw(mand kvinde) }
+	}
+	
+  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
+	
+  * Types now have their own $VERSION
   
-  added HEX, BINARY types
+  * Some minor changes
+    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
+      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
+    - toc() now lists also export alias's
+    - regex's are now centralized and accessible via Regex::list( 'key' );
+	
