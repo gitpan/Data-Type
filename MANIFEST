@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Todo
+test.pl
+Type.pm
+t/basic.t
+t/describe.t
+t/guard.t
+t/email_valid.t
+t/creditcard.t
+t/db.t
+t/regexp_common.t
+

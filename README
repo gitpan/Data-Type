@@ -1,0 +1,154 @@
+NAME
+
+Data::Type - versatile data/type verification, validation and testing
+
+VERSION
+
+0.01.01 (Tue Jan  7 23:27:21 2003)
+
+DESCRIPTION
+
+This module supports types. Out of the ordinary it supports parameterised types (like
+databases have i.e. VARCHAR(80) ). When you try to feed a typed variable against some
+odd data, this module explains what he would have expected. It doesnt support casting (yet).
+
+Backend was realized with Regexp::Common, Email::Valid and Business::CreditCard.
+
+TYPES and FILTERS
+
+perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
+
+Data::Type 0.01.01 supports 27 types:
+
+  BINARY             - binary code
+  BOOL               - a true or false value
+  CREDITCARD         - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
+  DATE               - a date
+  DATETIME           - a date and time combination
+  EMAIL              - an email address
+  ENUM               - a member of an enumeration
+  GENDER             - a gender (male|female)
+  HEX                - hexadecimal code
+  INT                - an integer
+  IP                 - an IP (V4, MAC) network address
+  LONGTEXT           - text with a max length of 4294967295 (2^32 - 1) characters (..
+  MEDIUMTEXT         - text with a max length of 16777215 (2^24 - 1) characters (al..
+  NUM                - a number
+  QUOTED             - a quoted string
+  REAL               - a real
+  REF                - a reference to a variable
+  SET                - a set (can have a maximum of 64 members (mysql))
+  TEXT               - blob with a max length of 65535 (2^16 - 1) characters (alias..
+  TIME               - a time
+  TIMESTAMP          - a timestamp
+  TINYTEXT           - text with a max length of 255 (2^8 - 1) characters (alias my..
+  URI                - an http uri
+  VARCHAR            - a string with limited length of choice (default 60)
+  WORD               - a word (without spaces)
+  YEAR               - a year in 2- or 4-digit format
+  YESNO              - a simple answer (yes|no)
+
+And 4 filters:
+
+  chomp              - chomps
+  lc                 - lower cases
+  strip              - strip
+  uc                 - upper cases
+
+GROUPED TOC
+
+ Logic
+  CREDITCARD, REF
+
+ Database
+   Logic
+      ENUM, SET
+
+   Time or Date related
+      DATE, DATETIME, TIME, TIMESTAMP, YEAR
+
+   String
+      LONGTEXT, MEDIUMTEXT, TEXT, TINYTEXT
+
+ W3C
+   String
+      BINARY, HEX
+
+ Numeric
+  BOOL, INT, NUM, REAL
+
+ String
+  EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+
+
+GROUP Database
+These are types from the mysql database builtin types.
+
+CREDITCARD
+
+This type isn't tested at all and nobody should rely on it.
+
+Supported are: 'Diners Club', 'Australian BankCard', 'VISA', 'Discover/Novus', 'JCB', 'MasterCard', 'Carte Blache', 'American Express'. 
+They are parameterised as: DINERS, BANKCARD, VISA, DISCOVER, JCB, MASTERCARD, BLACHE, AMEX.
+
+EXAMPLES
+
+Look in the t directory (of the release) for examples. Here a very simple one:
+
+use Data::Type qw(:all);
+use Error qw(:try);
+
+	try
+	{
+		verify( 'muenalan<at>cpan.org' , EMAIL );
+		
+		print "email valid";
+	}
+	catch Type::Exception with
+	{
+		print "this is not an email";
+	};
+
+KEYWORDS
+
+data types, data manipulation, data patterns, form data, user input, tie
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+CPAN PREREQUISITES
+Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Iter (0)
+
+CONTRIBUTIONS
+
+The author is happy to receive more types (formats) and add to this library. If you
+have a algorithm/regex for validating it, the better. Just email me.
+
+AUTHOR
+
+Murat Ünalan, <murat.uenalan@cpan.org>
+
+COPYRIGHT/LICENSE
+
+(c) 2002 by Murat Ünalan. All rights reserved. Note: This program is
+free software; you can redistribute it and/or modify it under the same
+terms as perl itself
+
+
+LAST CHANGES 0.01.01
+
+  Migrated from 'Data::Verify' to 'Data::Type' namespace
+  Removed the pre-alpha disclaimer from README
+  This now is alpha software
+
+  added IType::W3C Interface where types from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/ are implemented
+  changed 'Function' namespace to 'Facet' conforming w3c
+  
+  added HEX, BINARY types

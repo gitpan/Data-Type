@@ -1,0 +1,66 @@
+todo
+{
+	Write a Class::Maker extension for verifying if the attributes match its types (This can be done
+	with a flexible (reflex-inspecting) bouncer).
+}
+
+todo
+{
+	- Implement decision table for bouncer-like (bouncer is far too simple for the new possibilities)
+	scenarios.
+}
+
+todo
+{
+	Create warnings/exceptions with correct line-numbering.
+}
+done
+{
+	implemented via caller. cave: was_file and was_line is used for Failure::Type exception.
+}
+
+todo
+{
+	clean the exception/Error handling. Somehow ->line and ->file don't function correctly.
+}
+done
+
+todo
+{
+	overify() / Data::Type::Guard should report which member failed
+}
+
+todo
+{
+	Filter::'s should also have delayed calls via AUTOLOAD like Type::
+}
+
+todo
+{
+	Add some localization. Like Types::DE::phone etc.
+}
+
+todo
+{
+	Pay a round of usefull ->usage information to the types.
+}
+
+todo
+{
+	Prepare api for casting of types. 
+	Suggestion: my $a_castedto_b = TYPE_A->cast( TYPE_B );
+}
+step
+{
+	added Type::UNIVERSAL::cast()
+}
+
+todo
+{
+	More types
+}
+
+todo
+{
+	refactor names to terminus technicii from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#datatype
+}
