@@ -50,15 +50,15 @@ Class::Maker::class 'Human',
 
 ok( $g->inspect( $h ) );
 
-	push @{ $g->types }, 'Animal';
+	push @{ $g->allow }, 'Animal';
 	
 ok( $g->inspect( $h ), 0 );
 
-	push @{ $g->types }, 'Human';
+	push @{ $g->allow }, 'Human';
 
 ok( $g->inspect( $h ), 0 );
 
-	@{ $g->types } = ();
+	@{ $g->allow } = ();
 
 ok( $g->inspect( $h ), 1 );
 

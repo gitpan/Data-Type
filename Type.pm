@@ -9,6 +9,8 @@ use Class::Maker;
 
 use Error qw(:try);
 
+use Locale::Language;	# required by langcode langname
+
 package Type::Exception;
 
 	our @ISA = qw(Error);
@@ -92,7 +94,7 @@ package Data::Type;
 
 	our @EXPORT = ();
 
-	our $VERSION = "0.01.02";
+	our $VERSION = "0.01.03";
 
 	our $DEBUG = 0;
 
@@ -269,22 +271,24 @@ package Data::Type;
 
 	sub catalog
 	{
-		my @types = type_list();
+		my @types = sort { $a cmp $b } type_list();
 
 		my $result;
 		
 		$result .= sprintf __PACKAGE__." $VERSION supports %d types:\n\n", scalar @types;
 				
-		foreach my $name ( sort { $a cmp $b } @types )
+		foreach my $name ( @types )
 		{						
-			$result .= sprintf "%s%-18s - %s\n", " " x 2, 
+			$result .= sprintf "%s%-15s %-8s - %s\n", " " x 2, 
 				
 				"Type::${name}"->can( 'export' ) ? join( ', ', "Type::${name}"->export ) : _translate( $name ), 
+
+				"Type::${name}"->VERSION || '', 				
 				
 				strlimit( ( bless [], "Type::${name}" )->info(  ) );
 		}
 
-		@types = filter_list();
+		@types = sort { $a cmp $b } filter_list();
 
 		$result .= sprintf "\nAnd %d filters:\n\n", scalar @types;
 
@@ -323,7 +327,7 @@ package Data::Type;
 				
 			if( ref( $val ) eq 'ARRAY' )
 			{
-				$result .= sprintf "%s%s\n\n", "  " x $ind, join( ', ', @$val ); 
+				$result .= sprintf "%s%s\n\n", "  " x $ind, join( ', ', sort { $a cmp $b } @$val ); 
 			}
 			elsif( ref( $val ) eq 'HASH' )
 			{			
@@ -366,7 +370,7 @@ package Data::Type;
 										
 			my $special_key = [ _unique_ordered map { $_->can( 'desc' ) ?  $_->desc : () } @isa ];
 						
-			$tied_hash{ $special_key } = [] unless exists $tied_hash{ $special_key };
+			$tied_hash{ $special_key } = [] unless defined $tied_hash{ $special_key };
 										 
 			push @{ $tied_hash{ $special_key } }, 
 				
@@ -544,6 +548,12 @@ package Regex;
 		hex => qr/[0-9a-fA-F]+/,
 		
 		email => qr/(?:[^\@]*)\@(?:\w+)(?:\.\w+)+/,	# not used 
+
+		dna => qr/[ATGC]+/,
+		
+		rna => qr/[AUGC]+/,
+		
+		triplet => qr/[ATGC]{3,3}/,
 	};
 	
 	sub list
@@ -609,6 +619,14 @@ package IType::W3C;
 	our @ISA = qw(IType::UNIVERSAL);
 
 	sub desc { 'W3C' }
+
+package IType::Business;
+
+	our @ISA = qw(IType::UNIVERSAL);
+
+	our $VERSION = '0.01.03';
+	
+	sub desc { 'Business' }
 
 package Type::varchar;
 
@@ -1229,7 +1247,7 @@ package Type::ref;
 
 package Type::creditcard;
 
-	our @ISA = qw(IType::Logic);
+	our @ISA = qw(IType::Business);
 
 	our $cardformats = 
 	{
@@ -1427,6 +1445,284 @@ package Type::hex;
 			Filter::strip->filter( \$Type::value, '\s' );
 
 			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'hex' ) ) ) );
+	}
+
+package Type::langcode;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.03';
+	
+	sub info
+	{
+		my $this = shift;
+
+		return qq{a Locale::Language language code};
+	}
+
+	sub usage 
+	{
+		
+	return '';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+			Filter::lc->filter( \$Type::value );
+						
+			Data::Type::pass( Facet::Proxy::exists( [ Locale::Language::all_language_codes() ] ) );
+	}
+
+package Type::langname;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.03';
+	
+	sub info
+	{
+		my $this = shift;
+
+		return qq{a Locale::Language language name};
+	}
+
+	sub usage 
+	{
+		
+	return '';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+						
+			Data::Type::pass( Facet::Proxy::exists( [ Locale::Language::all_language_names() ] ) );
+	}
+
+package Type::issn;
+
+	our @ISA = qw(IType::Business);
+
+	our $VERSION = '0.01.03';
+
+	sub info
+	{
+		my $this = shift;
+
+		return qq{an International Standard Serial Number};
+	}
+
+	sub usage 
+	{
+		
+	return 'example: 14565935';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+
+			use Business::ISSN;
+			
+			throw Failure::Facet() unless new Business::ISSN( $Type::value )->is_valid;
+	}
+
+package Type::upc;
+
+	our @ISA = qw(IType::Business);
+
+	our $VERSION = '0.01.03';
+
+	sub info
+	{
+		my $this = shift;
+
+		return qq{standard (type-A) Universal Product Code};
+	}
+
+	sub usage 
+	{
+		return 'i.e. 012345678905';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+
+			use Business::UPC;
+			
+			throw Failure::Facet() unless Business::UPC->new( $Type::value )->is_valid;
+	}
+
+package Type::cins;
+
+	our @ISA = qw(IType::Business);
+
+	our $VERSION = '0.01.03';
+
+	sub info
+	{
+		my $this = shift;
+
+		return qq{a CUSIP International Numbering System Number};
+	}
+
+	sub usage 
+	{
+		
+	return 'i.e. 035231AH2';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+
+			use Business::CINS;
+
+			my $result = Business::CINS->new( $Type::value )->error;
+			
+			throw Failure::Facet( text => $result ) if defined $result;
+	}
+
+	# BIO stuff
+	
+	# Resources: http://users.rcn.com/jkimball.ma.ultranet/BiologyPages/C/Codons.html
+	# CPAN: Bio::Tools::CodonTable 	
+	
+package Type::dna;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.03';
+
+	sub export { qw(BIO::DNA) }
+
+	sub info
+	{
+		my $this = shift;
+
+		return q{a dna sequence};
+	}
+
+	sub usage 
+	{
+		
+	return 'sequence of [ATGC]';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'dna' ) ) ) );
+	}
+
+package Type::rna;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.03';
+
+	sub export { qw(BIO::RNA) }
+
+	sub info
+	{
+		my $this = shift;
+
+		return qq{a rna sequence};
+	}
+
+	sub usage 
+	{
+		
+	return 'sequence of [ATUC]';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'rna' ) ) ) );
+	}
+
+	# Resource:
+	# 
+	
+package Type::codon;
+
+	our @ISA = qw(IType::Logic);
+
+	our $VERSION = '0.01.03';
+
+	sub export { qw(BIO::CODON) }
+
+	sub info
+	{
+		my $this = shift;
+
+		return qq{a DNA (default) or RNA nucleoside triphosphates triplet};
+	}
+
+	sub usage 
+	{
+		
+	return 'a triplet of DNA or RNA';
+	}
+	
+	sub test
+	{
+		my $this = shift;
+
+		$Type::value = shift;
+
+			Filter::strip->filter( \$Type::value, '\s' );
+			Filter::chomp->filter( \$Type::value );
+			Filter::uc->filter( \$Type::value );
+			
+			my $kind = $this->[0] || 'DNA';
+			
+			die sprintf "'%s' expects 'DNA' or 'RNA' as an argument and not '%s'",$this->export,$kind unless $kind eq 'DNA' || $kind eq 'RNA';
+			
+			#Data::Type::verify $Type::value, Type::Proxy::dna if $kind eq 'DNA';
+			#Data::Type::verify $Type::value, Type::Proxy::rna if $kind eq 'RNA';
+			
+			Data::Type::pass( Facet::Proxy::match( Regex::exact( Regex::list( 'triplet' ) ) ) );
 	}
 
 	#
@@ -1661,18 +1957,23 @@ package Facet::exists;
 	sub test : method
 	{
 		my $this = shift;
-
+			        
 		my $val = shift;
-
+				
 			if( ref( $val ) eq 'ARRAY' )
-			{
+			{				
+					# if we have to test against an array, just go through the
+					# elements and look if they exist in the $val hash
+					
 				$this->test( $_ ) for @$val;
 
 				return;
 			}
 
+				# convert an array to hash inplace
+				
 			if( ref( $this->[0] ) eq 'ARRAY' )
-			{
+			{				
 				my %hash;
 
 				@hash{ @{ $this->[0] } } = 1;
@@ -1761,7 +2062,7 @@ package Filter::lc;
 
 		my $sref_val = shift;
 		
-	return lc $$sref_val;
+	return $$sref_val = lc $$sref_val;
 	}
 
 	sub info : method
@@ -1805,7 +2106,7 @@ package Filter::uc;
 
 		my $sref_val = shift;
 		
-	return lc $$sref_val;
+	return $$sref_val = uc $$sref_val;
 	}
 
 	sub info : method
@@ -1885,7 +2186,7 @@ package Data::Type::Guard;
 	{
 		public =>
 		{
-			array => [qw( types )],
+			array => [qw( allow )],
 			
 			hash => [qw( tests )],
 		},
@@ -1899,15 +2200,15 @@ package Data::Type::Guard;
 
 		my $decision;
 
-		if( @{ $this->types } > 0 )
+		if( @{ $this->allow } > 0 )
 		{			
 			my %t;
 	
-			@t{ $this->types } = 1;
+			@t{ $this->allow } = 1;
 
 			unless( exists $t{ ref( $object ) } )
 			{
-				carp "Guard is selective and only accepts ", join ', ', $this->types if $Data::Type::DEBUG;
+				carp "Guard is selective and only accepts ", join ', ', $this->allow if $Data::Type::DEBUG;
 				
 				return 0;
 			}    			
@@ -1933,52 +2234,141 @@ __END__
 
 =head1 NAME
 
-Data::Type - versatile data/type verification, validation and testing
+Data::Type - versatile data and value types
 
 =head1 SYNOPSIS
 
 	use Data::Type qw(:all);
 	use Error qw(:try);
-
-	# EMAIL, URI, IP('V4') are standard types
 	
 	try
 	{
-		verify( $cgi->param( 'email' ),    EMAIL  );
-		verify( $cgi->param( 'homepage' ), URI('http') );
-		verify( $cgi->param( 'serverip' ), IP('v4') );
-		verify( $cgi->param( 'cc' ),       CREDITCARD( 'MASTERCARD', 'VISA' ) );
+		verify $email		, EMAIL;
+		verify $homepage	, URI('http');
+		verify $server_ip	, IP('v4');
+		verify $cc			, CREDITCARD( 'MASTERCARD', 'VISA' );
+		verify $answer_a	, YESNO;
+		verify $gender		, GENDER;
+		verify 'one'		, ENUM( qw(one two three) );
+		verify [qw(two six)], SET( qw(one two three four five six) ) );
+
+		verify 'A35231AH1'	, CINS;
+		verify '14565935'	, ISSN;		
+		verify 'DE'			, LANGCODE;		
+		verify 'German'		, LANGNAME;
+		
+		verify '012345678905', UPC();
+		verify '5276440065421319', CREDITCARD( 'MASTERCARD' ) );
+
+		verify 'ATGCAAAT'	, BIO::DNA;				
+		verify 'AUGGGAAAU'	, BIO::RNA;		
+
+		verify '01001001110110101', BINARY;
+		verify '0F 0C 0A', HEX;
+
+		verify '234'		, NUM( 20 );
+		verify '1' 			, BOOL( 'true' );
+		verify '100'		, INT;
+		verify '1.1'		, REAL;
+
+		my $foo = bless( \'123', 'SomeThing' );
+			
+		verify $foo 		, REF;
+		verify $foo			, REF( qw(SomeThing Else) );
+		verify [ 'bar' ]	, REF( 'ARRAY' );
+
+		verify ' ' x 20		, VARCHAR( 20 );
+		verify '2001-01-01'	, DATE( 'MYSQL' );
+		verify '16 Nov 94 22:28:20 PST'	, DATE( 'DATEPARSE' );
+		verify '9999-12-31 23:59:59', DATETIME;
+		verify '1970-01-01 00:00:00', TIMESTAMP;
+		verify '-838:59:59'	, TIME;
+		verify '2155'		, YEAR;
+		verify '69'			, YEAR(2);
+		verify '0' x 20		, TINYTEXT;
+		verify '0' x 20		, MEDIUMTEXT;
+		verify '0' x 20		, LONGTEXT;
+		verify '0' x 20		, TEXT;
 	}
 	catch Type::Exception with
 	{	
-		printf "Expected '%s' %s at %s line %s\n", $_->value, $_->type->info, $_->was_file, $_->was_line foreach @_;
+		my $e = shift;
+		
+		printf "Expected '%s' %s at %s line %s\n",
+			$e->value, 
+			$e->type->info, 
+			$e->was_file, 
+			$e->was_line;
+
+		foreach my $entry ( testplan( $e->type ) )
+		{
+			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', $entry->[0]->info();
+		}
 	};
 
-	my $h = Human->new( email => 'j@d.de', firstname => 'john', lastname => 'doe', sex => 'male', countrycode => '123123', age => 12 );
-	
-	$h->contacts( { lucy => '110', john => '123' } );
-	
+		# believe it or not, this really works
+		
+	foreach ( EMAIL, WORD, CREDITCARD( 'MASTERCARD', 'VISA' ), BIO::DNA, HEX )
+	{
+		print $_->info;						
+		print $_->usage;					
+		print $_->export;					# does it have other names
+		print $_->choice;					# what are my choice i.e. [yes,no]
+		print $_->isa( 'IType::Business' ); # is it a Business related type ?
+		print $_->VERSION;					# first apperance in Data::Type release
+	}
+		
+		# tied interface (alias 'typ')
+		
+	try
+	{			
+		typ ENUM( qw(DNA RNA) ), \( my $a, my $b );
+
+		print "a is typ'ed" if istyp( $a );
+
+		$a = 'DNA';		# $alias only accepts 'DNA' or 'RNA'
+		$a = 'RNA';		
+		$a = 'xNA';		# throws exception 
+		
+		untyp( $alias );
+	}
+	catch Type::Exception ::with
+	{
+		printf "Expected '%s' %s at %s line %s\n",
+			$e->value, 
+			$e->type->info, 
+			$e->was_file, 
+			$e->was_line;
+	};
+		
 	my $g = Data::Type::Guard->new( 
 
-		types => [ 'Human', 'Others' ],
+		allow => [ 'Human', 'Others' ],		# blessed objects of that type
 		
 		tests =>
 		{
 			email		=> EMAIL( 1 ),		# mxcheck ON ! see Email::Valid
 			firstname	=> WORD,
+			social_id	=> [ NUM, VARCHAR( 10 ) ],
 			contacts	=> sub { my %args = @_; exists $args{lucy} },				
 		}
 	);
 	
 	$g->inspect( $h );
+
+		# compact version
+		
+	overify { email => EMAIL( 1 ), firstname => WORD }, $object_a, $object_b;
+	
+	print toc();
+	
+	print catalog();
 	
 =head1 DESCRIPTION
 
-This module supports types. Out of the ordinary it supports parameterised types (like
-databases have i.e. VARCHAR(80) ). When you try to feed a typed variable against some
-odd data, this module explains what he would have expected. It doesnt support casting (yet).
-
-Backend was realized with Regexp::Common, Email::Valid and Business::CreditCard.
+This module supports versatile data and value types. Out of the ordinary it supports 
+parameterised types (like databases have i.e. VARCHAR(80) ). When you try to feed a 
+typed variable against some odd data, this module explains what he would have expected. 
 
 
 =head1 KEYWORDS
@@ -1989,36 +2379,44 @@ data types, data manipulation, data patterns, form data, user input, tie
 
 perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
 
-Data::Type 0.01.02 supports 28 types:
+Data::Type 0.01.03 supports 36 types:
 
-  BINARY             - binary code
-  BOOL               - a true or false value
-  CREDITCARD         - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
-  DATE               - a date (mysql or Date::Parse conform)
-  DATETIME           - a date and time combination
-  DK::YESNO          - a simple answer (mand, kvinde)
-  EMAIL              - an email address
-  ENUM               - a member of an enumeration
-  GENDER             - a gender male, female
-  HEX                - hexadecimal code
-  INT                - an integer
-  IP                 - an IP (V4, MAC) network address
-  LONGTEXT           - text with a max length of 4294967295 (2^32 - 1) characters (..
-  MEDIUMTEXT         - text with a max length of 16777215 (2^24 - 1) characters (al..
-  NUM                - a number
-  QUOTED             - a quoted string
-  REAL               - a real
-  REF                - a reference to a variable
-  SET                - a set (can have a maximum of 64 members (mysql))
-  TEXT               - blob with a max length of 65535 (2^16 - 1) characters (alias..
-  TIME               - a time (mysql)
-  TIMESTAMP          - a timestamp (mysql)
-  TINYTEXT           - text with a max length of 255 (2^8 - 1) characters (alias my..
-  URI                - an http uri
-  VARCHAR            - a string with limited length of choice (default 60)
-  WORD               - a word (without spaces)
-  YEAR               - a year in 2- or 4-digit format
-  YESNO              - a simple answer (yes, no)
+  BINARY                   - binary code
+  BOOL                     - a true or false value
+  CINS            0.01.03  - a CUSIP International Numbering System Number
+  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
+  CREDITCARD               - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
+  DATE            0.01.01  - a date (mysql or Date::Parse conform)
+  DATETIME                 - a date and time combination
+  DK::YESNO                - a simple answer (ja, nein)
+  BIO::DNA        0.01.03  - a dna sequence
+  EMAIL                    - an email address
+  ENUM                     - a member of an enumeration
+  GENDER                   - a gender male, female
+  HEX                      - hexadecimal code
+  INT                      - an integer
+  IP                       - an IP (V4, MAC) network address
+  ISSN            0.01.03  - an International Standard Serial Number
+  LANGCODE        0.01.03  - a Locale::Language language code
+  LANGNAME        0.01.03  - a Locale::Language language name
+  LONGTEXT                 - text with a max length of 4294967295 (2^32 - 1) characters (..
+  MEDIUMTEXT               - text with a max length of 16777215 (2^24 - 1) characters (al..
+  NUM                      - a number
+  QUOTED                   - a quoted string
+  REAL                     - a real
+  REF                      - a reference to a variable
+  BIO::RNA        0.01.03  - a rna sequence
+  SET                      - a set (can have a maximum of 64 members (mysql))
+  TEXT                     - blob with a max length of 65535 (2^16 - 1) characters (alias..
+  TIME                     - a time (mysql)
+  TIMESTAMP                - a timestamp (mysql)
+  TINYTEXT                 - text with a max length of 255 (2^8 - 1) characters (alias my..
+  UPC             0.01.03  - standard (type-A) Universal Product Code
+  URI                      - an http uri
+  VARCHAR                  - a string with limited length of choice (default 60)
+  WORD                     - a word (without spaces)
+  YEAR                     - a year in 2- or 4-digit format
+  YESNO                    - a simple answer (yes, no)
 
 And 4 filters:
 
@@ -2028,10 +2426,10 @@ And 4 filters:
   UC                 - upper cases
 
 
-=head1 GROUPED TYPES TOC
+=head1 TYPES BY GROUP
 
  Logic
-  CREDITCARD, REF
+  BIO::CODON, BIO::DNA, BIO::RNA, LANGCODE, LANGNAME, REF
 
  Database
    Logic
@@ -2042,6 +2440,9 @@ And 4 filters:
 
    String
       LONGTEXT, MEDIUMTEXT, TEXT, TINYTEXT
+
+ Business
+  CINS, CREDITCARD, ISSN, UPC
 
  W3C
    String
@@ -2067,7 +2468,7 @@ overify( { member => TYPE, .. }, $object, [ .. ] ) - Verifies members of objects
 This is something like a Bouncer. He inspect 'object' members for a specific type. The class has two attributes and one
 member.
 	
-=head3 'types' attribute (Array)
+=head3 'allow' attribute (Array)
 
 If empty isn't selective for special references (  HASH, ARRAY, "CUSTOM", .. ). If is set then "inspect" will fail if the object
 is not a reference of the listed type.
@@ -2087,23 +2488,6 @@ typ/untyp/istyp
 
 typ and untyp are simlar to perl's tie/untie, but they are for Data::Type's. They tie a Data::Type to a variable, so
 each time it gets assigned a new value, it gots verified if its matching the datatypes constrains.
-
-=head3 Example	
-
-	try
-	{
-		typ ENUM( qw(Murat mo muri) ), \( my $alias );
-	
-		$alias = 'Murat';
-	
-		$alias = 'mo';
-	
-		$alias = 'XXX';
-	}
-	catch Type::Exception ::with
-	{
-		printf "Expected '%s' %s at %s line %s\n", $_->value, $_->type->info, $_->was_file, $_->was_line foreach @_;
-	};
 
 =head1 Exceptions
 
@@ -2158,63 +2542,34 @@ returns a string containing a grouped listing of all know types.
 
 Returns the entry-objects how the type is verified. This may be used to create a textual description how a type is verified.
  
-		foreach my $entry ( testplan( $type ) )
-		{
-			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', $entry->[0]->info();
-		}
-
 =head2 EXPORT
 
 all = (typ untyp istyp verify catalog testplan), map { uc } @types
 
 None by default.
 
-=head2 LAST CHANGES 0.01.02
-
-  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
-    posted by Henrik Tougaard via RT
-
-    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
-	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
-	- Introduced locale support (added empty package Data::Type::Locale)
-	- separated localizable type parameters to methods, so they are overridable through inheriting
-	localized types:
-	
-	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
-
-	{
-	package Type::yesno;
-
-		our @ISA = qw(IType::String);
-	
-		sub info 
-		{	
-			my $this = shift;
-					
-			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
-		}
-	
-		sub choice { qw(yes no) }
-	
-	package Type::dk_yesno;
-
-		our @ISA = qw(Type::yesno);
-		
-		sub export { qw(DK::YESNO) };
-			
-		sub choice { qw(mand kvinde) }
-	}
-	
-  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
-	
-  * Types now have their own $VERSION
+=head2 LAST CHANGES 0.01.03
   
+  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
+  
+  * New group IType::Business (see toc).
+
   * Some minor changes
-    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
-      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
-    - toc() now lists also export alias's
-    - regex's are now centralized and accessible via Regex::list( 'key' );
-	
+   - toc() now sorts types alphanumeretically
+   - IType:: Groups also get version
+   - added type version number to catalog() output
+
+  * New (or updated) types:
+  
+  CINS            0.01.03  - a CUSIP International Numbering System Number
+  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
+  BIO::DNA        0.01.03  - a dna sequence
+  ISSN            0.01.03  - an International Standard Serial Number
+  LANGCODE        0.01.03  - a Locale::Language language code
+  LANGNAME        0.01.03  - a Locale::Language language name
+  BIO::RNA        0.01.03  - a rna sequence
+  UPC             0.01.03  - standard (type-A) Universal Product Code
+   
 
 =head1 AUTHOR
 

@@ -60,4 +60,26 @@ Revision history for Perl extension Data::Type.
       @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
     - toc() now lists also export alias's
     - regex's are now centralized and accessible via Regex::list( 'key' );
-	
+
+0.01.03
+  
+  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
+  
+  * New group IType::Business (see toc).
+
+  * Some minor changes
+   - toc() now sorts types alphanumeretically
+   - IType:: Groups also get version
+   - added type version number to catalog() output
+
+  * New (or updated) types:
+  
+  CINS            0.01.03  - a CUSIP International Numbering System Number
+  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
+  BIO::DNA        0.01.03  - a dna sequence
+  ISSN            0.01.03  - an International Standard Serial Number
+  LANGCODE        0.01.03  - a Locale::Language language code
+  LANGNAME        0.01.03  - a Locale::Language language name
+  BIO::RNA        0.01.03  - a rna sequence
+  UPC             0.01.03  - standard (type-A) Universal Product Code
+   

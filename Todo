@@ -23,6 +23,8 @@ todo
 todo
 {
 	Add some localization. Like DE::PHONE which is Type::DE::phone etc.
+	
+	Should use Locale::Maketext
 }
 
 todo
@@ -148,5 +150,10 @@ todo( DOCU )
 
 todo
 {
-	catalog/toc with localization as category
+	catalog/toc with grouping for localization
+}
+
+todo
+{
+	recognize new types via their VERSION in release.pl, so we could place them via templates
 }

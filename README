@@ -1,114 +1,148 @@
 NAME
 
-Data::Type - versatile data/type verification, validation and testing
+Data::Type - versatile data and value types
 
 VERSION
 
-0.01.02 (Sun Jan 12 08:00:30 2003)
+0.01.03 (Tue Jan 14 04:07:18 2003)
 
 DESCRIPTION
 
-This module supports types. Out of the ordinary it supports parameterised types (like
-databases have i.e. VARCHAR(80) ). When you try to feed a typed variable against some
-odd data, this module explains what he would have expected. It doesnt support casting (yet).
+This module supports versatile data and value types. Out of the ordinary it supports 
+parameterised types (like databases have i.e. VARCHAR(80) ). When you try to feed a 
+typed variable against some odd data, this module explains what he would have expected. 
 
-Backend was realized with Regexp::Common, Email::Valid and Business::CreditCard.
+SYNOPSIS
 
-TYPES and FILTERS
+	use Data::Type qw(:all);
+	use Error qw(:try);
+	
+	try
+	{
+		verify $email		, EMAIL;
+		verify $homepage	, URI('http');
+		verify $server_ip	, IP('v4');
+		verify $cc			, CREDITCARD( 'MASTERCARD', 'VISA' );
+		verify $answer_a	, YESNO;
+		verify $gender		, GENDER;
+		verify 'one'		, ENUM( qw(one two three) );
+		verify [qw(two six)], SET( qw(one two three four five six) ) );
 
-perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
+		verify 'A35231AH1'	, CINS;
+		verify '14565935'	, ISSN;		
+		verify 'DE'			, LANGCODE;		
+		verify 'German'		, LANGNAME;
+		
+		verify '012345678905', UPC();
+		verify '5276440065421319', CREDITCARD( 'MASTERCARD' ) );
 
-Data::Type 0.01.02 supports 28 types:
+		verify 'ATGCAAAT'	, BIO::DNA;				
+		verify 'AUGGGAAAU'	, BIO::RNA;		
 
-  BINARY             - binary code
-  BOOL               - a true or false value
-  CREDITCARD         - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
-  DATE               - a date (mysql or Date::Parse conform)
-  DATETIME           - a date and time combination
-  DK::YESNO          - a simple answer (mand, kvinde)
-  EMAIL              - an email address
-  ENUM               - a member of an enumeration
-  GENDER             - a gender male, female
-  HEX                - hexadecimal code
-  INT                - an integer
-  IP                 - an IP (V4, MAC) network address
-  LONGTEXT           - text with a max length of 4294967295 (2^32 - 1) characters (..
-  MEDIUMTEXT         - text with a max length of 16777215 (2^24 - 1) characters (al..
-  NUM                - a number
-  QUOTED             - a quoted string
-  REAL               - a real
-  REF                - a reference to a variable
-  SET                - a set (can have a maximum of 64 members (mysql))
-  TEXT               - blob with a max length of 65535 (2^16 - 1) characters (alias..
-  TIME               - a time (mysql)
-  TIMESTAMP          - a timestamp (mysql)
-  TINYTEXT           - text with a max length of 255 (2^8 - 1) characters (alias my..
-  URI                - an http uri
-  VARCHAR            - a string with limited length of choice (default 60)
-  WORD               - a word (without spaces)
-  YEAR               - a year in 2- or 4-digit format
-  YESNO              - a simple answer (yes, no)
+		verify '01001001110110101', BINARY;
+		verify '0F 0C 0A', HEX;
 
-And 4 filters:
+		verify '234'		, NUM( 20 );
+		verify '1' 			, BOOL( 'true' );
+		verify '100'		, INT;
+		verify '1.1'		, REAL;
 
-  CHOMP              - chomps
-  LC                 - lower cases
-  STRIP              - strip
-  UC                 - upper cases
+		my $foo = bless( \'123', 'SomeThing' );
+			
+		verify $foo 		, REF;
+		verify $foo			, REF( qw(SomeThing Else) );
+		verify [ 'bar' ]	, REF( 'ARRAY' );
 
-GROUPED TOC
+		verify ' ' x 20		, VARCHAR( 20 );
+		verify '2001-01-01'	, DATE( 'MYSQL' );
+		verify '16 Nov 94 22:28:20 PST'	, DATE( 'DATEPARSE' );
+		verify '9999-12-31 23:59:59', DATETIME;
+		verify '1970-01-01 00:00:00', TIMESTAMP;
+		verify '-838:59:59'	, TIME;
+		verify '2155'		, YEAR;
+		verify '69'			, YEAR(2);
+		verify '0' x 20		, TINYTEXT;
+		verify '0' x 20		, MEDIUMTEXT;
+		verify '0' x 20		, LONGTEXT;
+		verify '0' x 20		, TEXT;
+	}
+	catch Type::Exception with
+	{	
+		my $e = shift;
+		
+		printf "Expected '%s' %s at %s line %s\n",
+			$e->value, 
+			$e->type->info, 
+			$e->was_file, 
+			$e->was_line;
 
- Logic
-  CREDITCARD, REF
+		foreach my $entry ( testplan( $e->type ) )
+		{
+			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', $entry->[0]->info();
+		}
+	};
 
- Database
-   Logic
-      ENUM, SET
+		# believe it or not, this really works
+		
+	foreach ( EMAIL, WORD, CREDITCARD( 'MASTERCARD', 'VISA' ), BIO::DNA, HEX )
+	{
+		print $_->info;						
+		print $_->usage;					
+		print $_->export;					# does it have other names
+		print $_->choice;					# what are my choice i.e. [yes,no]
+		print $_->isa( 'IType::Business' ); # is it a Business related type ?
+		print $_->VERSION;					# first apperance in Data::Type release
+	}
+		
+		# tied interface (alias 'typ')
+		
+	try
+	{			
+		typ ENUM( qw(DNA RNA) ), \( my $a, my $b );
 
-   Time or Date related
-      DATE, DATETIME, TIME, TIMESTAMP, YEAR
+		print "a is typ'ed" if istyp( $a );
 
-   String
-      LONGTEXT, MEDIUMTEXT, TEXT, TINYTEXT
+		$a = 'DNA';		# $alias only accepts 'DNA' or 'RNA'
+		$a = 'RNA';		
+		$a = 'xNA';		# throws exception 
+		
+		untyp( $alias );
+	}
+	catch Type::Exception ::with
+	{
+		printf "Expected '%s' %s at %s line %s\n",
+			$e->value, 
+			$e->type->info, 
+			$e->was_file, 
+			$e->was_line;
+	};
+		
+	my $g = Data::Type::Guard->new( 
 
- W3C
-   String
-      BINARY, HEX
+		allow => [ 'Human', 'Others' ],		# blessed objects of that type
+		
+		tests =>
+		{
+			email		=> EMAIL( 1 ),		# mxcheck ON ! see Email::Valid
+			firstname	=> WORD,
+			social_id	=> [ NUM, VARCHAR( 10 ) ],
+			contacts	=> sub { my %args = @_; exists $args{lucy} },				
+		}
+	);
+	
+	$g->inspect( $h );
 
- Numeric
-  BOOL, INT, NUM, REAL
-
- String
-  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
-
-
-GROUP Database
-These are types from the mysql database builtin types.
-
-CREDITCARD
-
-This type isn't tested at all and nobody should rely on it.
-
-Supported are: 'Diners Club', 'Australian BankCard', 'VISA', 'Discover/Novus', 'JCB', 'MasterCard', 'Carte Blache', 'American Express'. 
-They are parameterised as: DINERS, BANKCARD, VISA, DISCOVER, JCB, MASTERCARD, BLACHE, AMEX.
+		# compact version
+		
+	overify { email => EMAIL( 1 ), firstname => WORD }, $object_a, $object_b;
+	
+	print toc();
+	
+	print catalog();
 
 EXAMPLES
 
-Look in the t directory (of the release) for examples. Here a very simple one:
-
-use Data::Type qw(:all);
-use Error qw(:try);
-
-	try
-	{
-		verify( 'muenalan<at>cpan.org' , EMAIL );
-		
-		print "email valid";
-	}
-	catch Type::Exception with
-	{
-		print "this is not an email";
-	};
+Visit the 't' directory.
 
 KEYWORDS
 
@@ -124,13 +158,103 @@ To install this module type the following:
    make install
 
 
-CPAN PREREQUISITES
-Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Iter (0), Date::Parse (2.23)
+TYPES and FILTERS
+
+perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
+
+Data::Type 0.01.03 supports 36 types:
+
+  BINARY                   - binary code
+  BOOL                     - a true or false value
+  CINS            0.01.03  - a CUSIP International Numbering System Number
+  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
+  CREDITCARD               - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
+  DATE            0.01.01  - a date (mysql or Date::Parse conform)
+  DATETIME                 - a date and time combination
+  DK::YESNO                - a simple answer (ja, nein)
+  BIO::DNA        0.01.03  - a dna sequence
+  EMAIL                    - an email address
+  ENUM                     - a member of an enumeration
+  GENDER                   - a gender male, female
+  HEX                      - hexadecimal code
+  INT                      - an integer
+  IP                       - an IP (V4, MAC) network address
+  ISSN            0.01.03  - an International Standard Serial Number
+  LANGCODE        0.01.03  - a Locale::Language language code
+  LANGNAME        0.01.03  - a Locale::Language language name
+  LONGTEXT                 - text with a max length of 4294967295 (2^32 - 1) characters (..
+  MEDIUMTEXT               - text with a max length of 16777215 (2^24 - 1) characters (al..
+  NUM                      - a number
+  QUOTED                   - a quoted string
+  REAL                     - a real
+  REF                      - a reference to a variable
+  BIO::RNA        0.01.03  - a rna sequence
+  SET                      - a set (can have a maximum of 64 members (mysql))
+  TEXT                     - blob with a max length of 65535 (2^16 - 1) characters (alias..
+  TIME                     - a time (mysql)
+  TIMESTAMP                - a timestamp (mysql)
+  TINYTEXT                 - text with a max length of 255 (2^8 - 1) characters (alias my..
+  UPC             0.01.03  - standard (type-A) Universal Product Code
+  URI                      - an http uri
+  VARCHAR                  - a string with limited length of choice (default 60)
+  WORD                     - a word (without spaces)
+  YEAR                     - a year in 2- or 4-digit format
+  YESNO                    - a simple answer (yes, no)
+
+And 4 filters:
+
+  CHOMP              - chomps
+  LC                 - lower cases
+  STRIP              - strip
+  UC                 - upper cases
+
+TYPES BY GROUP
+
+ Logic
+  BIO::CODON, BIO::DNA, BIO::RNA, LANGCODE, LANGNAME, REF
+
+ Database
+   Logic
+      ENUM, SET
+
+   Time or Date related
+      DATE, DATETIME, TIME, TIMESTAMP, YEAR
+
+   String
+      LONGTEXT, MEDIUMTEXT, TEXT, TINYTEXT
+
+ Business
+  CINS, CREDITCARD, ISSN, UPC
+
+ W3C
+   String
+      BINARY, HEX
+
+ Numeric
+  BOOL, INT, NUM, REAL
+
+ String
+  DK::YESNO, EMAIL, GENDER, IP, QUOTED, URI, VARCHAR, WORD, YESNO
+
+
+GROUP "Database"
+These are types identical to mysql database builtin types.
+
+CREDITCARD
+
+This type isn't tested at all and nobody should rely on it without rigorous testing.
+
+Supported are: 'Diners Club', 'Australian BankCard', 'VISA', 'Discover/Novus', 'JCB', 'MasterCard', 'Carte Blache', 'American Express'. 
+They are parameterised as: DINERS, BANKCARD, VISA, DISCOVER, JCB, MASTERCARD, BLACHE, AMEX.
 
 CONTRIBUTIONS
 
 The author is happy to receive more types (formats) and add to this library. If you
 have a algorithm/regex for validating it, the better. Just email me.
+
+CPAN PREREQUISITES
+It utilizes various CPAN modules as partially listed here.
+Class::Maker (0.05.10), Error (0.15), IO::Extended (0.05), Regexp::Common (1.20), Email::Valid (0.14), Tie::ListKeyedHash (0.41), Business::CreditCard (0.27), Business::ISSN (0.90), Business::UPC (0.02), Business::CINS (1.13), Iter (0), Date::Parse (2.23)
 
 AUTHOR
 
@@ -143,49 +267,25 @@ free software; you can redistribute it and/or modify it under the same
 terms as perl itself
 
 
-LAST CHANGES 0.01.02
-
-  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
-    posted by Henrik Tougaard via RT
-
-    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
-	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
-	- Introduced locale support (added empty package Data::Type::Locale)
-	- separated localizable type parameters to methods, so they are overridable through inheriting
-	localized types:
-	
-	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
-
-	{
-	package Type::yesno;
-
-		our @ISA = qw(IType::String);
-	
-		sub info 
-		{	
-			my $this = shift;
-					
-			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
-		}
-	
-		sub choice { qw(yes no) }
-	
-	package Type::dk_yesno;
-
-		our @ISA = qw(Type::yesno);
-		
-		sub export { qw(DK::YESNO) };
-			
-		sub choice { qw(mand kvinde) }
-	}
-	
-  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
-	
-  * Types now have their own $VERSION
+LAST CHANGES 0.01.03
   
+  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
+  
+  * New group IType::Business (see toc).
+
   * Some minor changes
-    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
-      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's). 
-    - toc() now lists also export alias's
-    - regex's are now centralized and accessible via Regex::list( 'key' );
-	
+   - toc() now sorts types alphanumeretically
+   - IType:: Groups also get version
+   - added type version number to catalog() output
+
+  * New (or updated) types:
+  
+  CINS            0.01.03  - a CUSIP International Numbering System Number
+  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
+  BIO::DNA        0.01.03  - a dna sequence
+  ISSN            0.01.03  - an International Standard Serial Number
+  LANGCODE        0.01.03  - a Locale::Language language code
+  LANGNAME        0.01.03  - a Locale::Language language name
+  BIO::RNA        0.01.03  - a rna sequence
+  UPC             0.01.03  - standard (type-A) Universal Product Code
+   

@@ -22,6 +22,12 @@ WriteMakefile(
 
 	Business::CreditCard => '0.27',
 
+	Business::ISSN => '0.90',
+
+	Business::UPC => '0.02',
+
+	Business::CINS => '1.13',
+
 	Iter => '0',
 
 	Date::Parse => '2.23',
