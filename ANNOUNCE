@@ -1,0 +1,126 @@
+
+From: Murat Uenalan <muenalan@cpan.org>
+Newsgroups: comp.lang.perl.announce
+Subject: [ANNOUNCE] Data::Type 0.01.15 enters CPAN
+
+
+LAST CHANGES 
+
+0.01.15
+  * verify now uses $_ per default, if only one argument is given.
+
+  * matches() introduced as an alias for dverify(). It exported per default.
+
+  * renamed matches() to is()
+
+  * Added Locale::Maketext localization.
+    - Accessible via $Data::Type::lh->maketext( )
+    - Served through Data::Type::L18N packages.
+    [Note] In first line, this is for international error reports. This
+    should help promptig ie. Webusers in front of an cgi-form.
+
+  * Renamed everything from 
+	Type:: to Data::Type::
+	Filter:: to Data::Type::Filter::
+	Facet:: to Data::Type::Facet
+
+  [Note] Now we don't pollute anyones namespace. Everything is beneath
+  C<Data::Type>.
+
+  * C<Data::Type::IType::UNIVERSAL> got C<alias()> method which returns
+    the exported name of that type.
+
+  * 'summary()' is the new name of 'testplan()' (which was 'complains()').
+    'testplan' is removed from the export symbols and 'summary() was added
+    instead
+
+  * C<pass> and C<fail> renamed to C<ok> and C<nok> (more intuitive).
+
+  * Renamed type "OS::PATH" export name to "PATH"
+
+  * Removed 'alias()' method from IType::UNIVERSAL because export() does the same.
+
+  * Renamed Data::Type::IType::UNIVERSAL to Data::Type::IType.
+
+  * C<summary()> 
+    - now returns Data::Type::Entry objects instead of simple aref.
+    - new usage: ( VALUE, ENTRY || [ ENTRY, ... ] )
+
+  * t/describe.t renamed to t/summary.t
+
+  * removed C<nok()>
+    - C<ok> now takes a bool argument if awaiting success/fail
+
+  * Usage changed: C<verify( $value, $test )>
+                   C<dverify( $value, $test )>
+
+  * Data::Type::Exception now has public C<catched> which holds the array
+  of preceding exceptions which induced it.
+
+  * @Data::Type::err holds the list of negative exceptions when C<dverify>
+  alias C<is> fails. Syntactic sugar:
+
+    unless( shift and is BIO::DNA )
+    {
+        print Dumper \@Data::Type::err;
+    }
+
+  LOCALE
+    - Types suffix the l18n language code: TYPE::DE for "de" (german).
+    
+    [Note] You would need an implicit Data::Type::L18N::de package.
+    Only C<type export> names with a correspondent ::L18N::xx package should
+    be allowed. This may not make sense when no localization is needed,
+    but it will prevent consufion.
+
+    - Data::Type::l18n_list() returns the implemented localized packages
+
+  FACETS
+    - move C<Data::Type::Facet::Proxy> to C<Data::Type::Facet>
+    - now every Facet isa C<Data::Type::IFacet> (empty)
+
+  API
+    - renamed C<verify> to C<valid>
+    - Data::Type::Facet::match has new usage
+    - Data::Type->filter now wants list of [ 'filtername', @args ]
+    - Data::Type::Object::*->test and Data::Type::Filter::*->test now doesnt take any args. Instead Data::Type::value is
+      consequently used.
+    - added C<isnt> as an alias for C<no is( TYPE )>
+    - Relaced 'IType' with 'Interface', so we got 'Data::Type::Interface' instead of 'Data::Type::IType'
+      Replaced 'IFacet' with 'Facet::Interface', so we now have 'Data::Type::Facet::Interface'
+
+  REGEXPS
+    - Every regex now lives in $Data::Type::Regex::registry
+    - Dynamic regex generation via coderef support (with arguments).
+    - Access via C<Data::Type::Regex->request( )>. This is a step further to facadeless
+    gateway to Regexp::Common (Hopefully will save a lot maintainance time).
+
+	moved Data::Type::Exception related objects to Data/Type/Exception.pm
+
+	added the HTML type (thanks to HMTM::Lint)
+
+
+Enjoy,
+Murat Uenalan
+
+NAME
+Data::Type - robust, extensible data- and valuetype system
+
+VERSION
+0.01.15 (Fri Sep 12 17:37:53 2003)
+
+DESCRIPTION
+
+This module delivers an easy, generic and unified interface to type related CPAN modules. They all have one common purpose: reporting if data has some "characteristics". They are good in that, but authors differ significantly in there api. Email::Valid is an illustrous example: reporting if a string has characteristics of an email address. The address() method reports this via returning 'yes' or 'no'. Another module, another behaviour: Business::ISSN tests for the characteristics of an "International Standard Serial Number" and does this via an is_valid() method returning <true> or <false>.
+
+AUTHOR
+Murat Uenalan, <muenalan@cpan.org>
+
+COPYRIGHT/LICENSE
+
+(c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+free software; you can redistribute it and/or modify it under the same
+terms as perl itself
+
+
+

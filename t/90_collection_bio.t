@@ -3,27 +3,26 @@ BEGIN { plan tests => 4; $| = 0 }
 
 use strict; use warnings;
 
-use Data::Type qw(:all);
-use Error qw(:try);
+use Data::Type qw(:all +Bio);
 use IO::Extended qw(:all);
 
 	try
 	{
 		print "#DNA testing..\n";
 
-			verify 'ATGCAAAT', BIO::DNA();
+			valid 'ATGCAAAT', BIO::DNA();
 				
 		print "#RNA testing..\n";
 
-			verify 'AUGGGAAAU', BIO::RNA();
+			valid 'AUGGGAAAU', BIO::RNA();
 		
 		print "#CODON testing..\n";
 
-			verify 'ATG', BIO::CODON();
+			valid 'ATG', BIO::CODON();
 		
 		ok(1);
 	}
-	catch Type::Exception with
+	catch Data::Type::Exception with
 	{
 		ok(0);
 		
@@ -36,11 +35,11 @@ use IO::Extended qw(:all);
 	{
 		print "#DNA testing..\n";
 
-			verify 'ZZZZZATGCAAAT', BIO::DNA();
+			valid 'ZZZZZATGCAAAT', BIO::DNA();
 		
 		ok(0);
 	}
-	catch Type::Exception with
+	catch Data::Type::Exception with
 	{
 		ok(1);
 	};
@@ -49,11 +48,11 @@ use IO::Extended qw(:all);
 	{
 		print "#RNA testing..\n";
 
-			verify 'ZZZZZZAUGGGAAAU', BIO::RNA();
+			valid 'ZZZZZZAUGGGAAAU', BIO::RNA();
 		
 		ok(0);
 	}
-	catch Type::Exception with
+	catch Data::Type::Exception with
 	{
 		ok(1);
 	};
@@ -62,11 +61,11 @@ use IO::Extended qw(:all);
 	{
 		print "#CODON testing..\n";
 
-			verify 'ZZZATG', BIO::CODON();
+			valid 'ZZZATG', BIO::CODON();
 		
 		ok(0);
 	}
-	catch Type::Exception with
+	catch Data::Type::Exception with
 	{
 		ok(1);
 	};

@@ -1,0 +1,77 @@
+=pod
+
+=head1 NAME
+
+Data::Type::Doc::FOP - frequently occuring problems
+
+=head1 DESCRIPTION
+
+FAQs are only the things asked by users who have overcome their motivation-curve to post a question. FOPs are things the author extracts from these questions (and one day will solve) or suffers himself quite often, but is not willing to change it in near future.
+
+=head1 FOPs
+
+=over 3
+
+=item *
+A function doesn't work. Somehow the try catch block isn't entered.
+
+Bug
+ dverify doesn't work.  Somehow the try catch block isn't entered.
+
+Solution
+ Was silly ';' missing after catch block ! This is a FOP with the Error module syntax sugar.    
+
+Example
+ 
+ try
+ {
+ }
+ catch Error with
+ {
+ }
+
+will fail ! Because the final ; is missing.
+  
+ ..
+
+ catch Error with
+ {
+ };
+
+is the correct syntax.
+
+[Note] Visit the L<Error> module pod.
+
+=item *
+Datatypes not exported. Misleading perl complains.
+
+Example
+
+ Use of inherited AUTOLOAD for non-method Data::Type::VARCHAR() is deprecated at test.pl line 91, <DATA> line 4454.
+ Can't locate class method 'Data::Type::VARCHAR' via package 'Data::Type' at test.pl line 91"
+
+Problem
+ codegen() isnt generating the proxy sub and the datatype name isnt exported
+
+Solution
+ Check for typos or whether you loaded the required collections for that type.
+
+  use Data::Type qw(:all +BIO);
+
+   shift;
+
+   print "no dna" if isnt BIO::DNA;
+
+=back
+
+
+=head1 CONTACT
+
+Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+
+
+=cut

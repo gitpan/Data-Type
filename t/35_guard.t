@@ -1,10 +1,8 @@
 use Test;
 BEGIN { plan tests => 5; $| = 0 }
 
-use strict; use warnings;
-
 use Data::Type qw(:all);
-use Error qw(:try);
+use Data::Type::Guard;
 use IO::Extended qw(:all);
 
 Class::Maker::class 'Human',
@@ -34,12 +32,12 @@ Class::Maker::class 'Human',
 	
 		tests =>
 		{
-			email		=> EMAIL, 
-			firstname	=> WORD,
-			lastname	=> WORD,
-			sex			=> GENDER,
-			countrycode => NUM,
-			age			=> NUM,
+			email		=> STD::EMAIL, 
+			firstname	=> STD::WORD,
+			lastname	=> STD::WORD,
+			sex		=> STD::GENDER,
+			countrycode 	=> STD::NUM,
+			age		=> STD::NUM,
 			contacts	=> sub { my %args = @_; exists $args{lucy} },				
 		}
 	);
@@ -63,6 +61,10 @@ ok( $g->inspect( $h ), 0 );
 ok( $g->inspect( $h ), 1 );
 
 	$h->firstname = undef;
-			
+
+	use Data::Dumper;
+	
+	print Data::Dumper->Dump( [ $h ] );
+	
 ok( $g->inspect( $h ), 0 );
 

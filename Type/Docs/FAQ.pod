@@ -1,0 +1,64 @@
+=pod
+
+=head1 NAME
+
+Data::Type::Docs::FAQ - frequently asked questions
+
+=head1 DESCRIPTION
+
+FAQs are the things asked by users.
+
+=head1 FAQs
+
+=over 3
+
+=item *
+Is it possible to add your my datatype at runtime and or install/configuration time ?
+
+Visit C<Data::Type::Docs::Howto> "How to add new types" ?
+
+=item * 
+Is there a localized version for <insert your language here> available ?
+
+It depends. Since B<Data::Type> is expandable via separate modules, you should try a search.cpan.org (as always) before starting to write your own.
+
+=item *
+How is a C<datatype> implemented ?
+
+C<Data::Type> verifies a data or value B<datatype> with a testing procedure. It is similar to the C<Test> module. The
+test program has one or multiple stages (which are called facets). If all facets pass sucessfully, a B<datatype> is programatically classified as "valid". This generic approach leads to reuse of facets and enough transparence to create instructive error reports.
+
+ A fictive procedure for 'SOMETHING'
+
+ sub test
+ {
+  ...
+
+  ok( 1, Data::Type::Facet::max( 20 ) );
+  ok( 1, Data::Type::Facet::min( 4 ) );
+
+  ... 
+ }
+
+=item *
+What are the minimal requirements for my own custom B<datatypes> ?
+
+Minimal requirements are a package in the C<Data::Type::Object::> namespace and some methods. Refer to the L<Data::Type::Docs::RFC> for the exact API.
+
+=back
+
+
+=head1 CONTACT
+
+Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+
+
+=head1 SEE ALSO
+
+See B<Data::Type::Docs::FOP> to get an extracted list of problems occured or by intention (by the author) can statistically occur quite often. Also visit the B<Data::Type::Docs::Howto> pod for a collection of procedures.
+
+=cut
