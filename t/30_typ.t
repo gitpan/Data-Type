@@ -2,8 +2,11 @@ use Test;
 BEGIN { plan tests => 14 }
 
 use strict;
+
 use Data::Type qw(:all +DB);
 use Data::Type::Tied qw(:all);
+
+use Data::Dumper;
 
 	Data::Type::println "# Testing tie to Data::Type::Tied\n";
 
@@ -21,7 +24,7 @@ use Data::Type::Tied qw(:all);
 	}
 	catch Data::Type::Exception with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;		
 	};
 
 	try
@@ -30,7 +33,7 @@ use Data::Type::Tied qw(:all);
 
 		$email = 'fakeemail%anywhere.de';	# Error
 		
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -47,7 +50,7 @@ use Data::Type::Tied qw(:all);
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -56,7 +59,7 @@ use Data::Type::Tied qw(:all);
 
 		$uri = 'xxx://test.de';	# Error
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -73,7 +76,7 @@ use Data::Type::Tied qw(:all);
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -84,7 +87,7 @@ use Data::Type::Tied qw(:all);
 
 		print "# Hmmm a ".length($var)." sized string should not pass VARCHAR(10)\n";
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -103,7 +106,7 @@ use Data::Type::Tied qw(:all);
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -112,7 +115,7 @@ use Data::Type::Tied qw(:all);
 
 		$ip = '127.0.0.1.x'; # Error
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -139,7 +142,7 @@ Class::Maker::class 'Watched',
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -150,7 +153,7 @@ Class::Maker::class 'Watched',
 
 		$watched->addr( 'XxXxX' ); # Error
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -171,7 +174,7 @@ Class::Maker::class 'Watched',
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -180,7 +183,7 @@ Class::Maker::class 'Watched',
 
 		$alias = 'idiot'; # Error ;)
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{
@@ -197,7 +200,7 @@ Class::Maker::class 'Watched',
 	}
 	catch Data::Type::Exception ::with
 	{
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	};
 
 	try
@@ -206,7 +209,7 @@ Class::Maker::class 'Watched',
 
 		$alias = [ 'john' ]; # Error ;)
 
-		ok(0);
+		print Dumper \@_ and ok(0);;
 	}
 	catch Data::Type::Exception ::with
 	{

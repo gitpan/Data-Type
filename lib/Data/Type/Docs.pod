@@ -1,5 +1,3 @@
-=pod
-
 =head1 NAME
 
 Data::Type::Docs - the manual overview
@@ -8,19 +6,19 @@ Data::Type::Docs - the manual overview
 
 =over 3
 
-=item Data::Type::Docs::FAQ
+=item L<Data::Type::Docs::FAQ>
 
 Frequently asked questions.
 
-=item Data::Type::Docs::FOP
+=item L<Data::Type::Docs::FOP>
 
 Frequently occuring problems.
 
-=item Data::Type::Docs::Howto
+=item L<Data::Type::Docs::Howto>
 
 Point to point recipes how to get things done.
 
-=item Data::Type::Docs::RFC
+=item L<Data::Type::Docs::RFC>
 
 Exact API description. Startpoint for datatype developers.
 
@@ -34,46 +32,31 @@ First read the following paragraphs and then you may start study the L<Data::Typ
 
 Because the subject is so stuffed with uncommon or not entry level 'keywords', here a short list of what is what.
 
-=over 3
-
-=item COMMON
-
-=over 3
-
-=item 'facade' or 'wrapper'
+=head2 I<facade> or I<wrapper>
 
 Sometimes classes have a weird API (of course, because personal taste). Unfortunately the logic behind is highly usefull (thats what CPAN is strong in) and you want invest time to rework everything. Then you can write a I<cleaner> API for that class that just use the original class in it. Or this may be usefull to easily switch the "worker" class behind your newly one (thats a facade then).
 
-=item 'exception'
+=head2 I<exception>
 
-An alternativ "problem encounter" strategie. Instead of returning C<undef> from you subroutine, you C<throw> an exception. Not the strongest point of perl5. But there are some modules on CPAN which try to do the best of it. The one with the nicest syntactic sugar is L<Error> and i use the derived C<Class::Maker::Exception> here. 
+Not the strongest point of perl5. But there are some modules on CPAN which try to do the best to emulate exception handling. The one with the nicest syntactic sugar is L<Error>. I derived an inheritable version with L<Class::Maker::Exception> which is readily available within L<Data::Type>. 
 
-=item 'interface'
-
-A collection of methods which are coupled to a package. Some methods have the attribute C<abstract>. This means there is just the name (and idea of what it should do in general) of the method, but you are forced to program the subroutine to fill it with logic. Then you "implemented" the C<abstract> method.
-
-=back
-
-=item SPECIFIC
-
-=over 3
-
-=item 'valuetype'
+=head2 I<valuetype>
 
 A candidate value is tested whether it fits within in a certain range of values (the B<value space>). The I<thing/objects/class/package> that represents and implements the logic of the B<value space> is the B<valuetype>.
 
-=item 'datatype'
+=head2 I<datatype>
 
 This is something more abstract. Within this documentation i refer to datatypes, but mostly mean valuetypes. From a practical point of view one could propagate that a datatype excels over a valuetype when it has the ability to be C<cast()>ed from one datatype into another. Some say a datatype should relate to physical boundaries of the computer (like bits, bytes, etc.). In fact the old datatypes were more usefull for a compilers optimizer then for the programmer.
 
 [Note] Apocalypse 6 (Larry Wall) and Synopsis 6 (Damian Conway, Allison Randal) issue this intensivly.
 
-=item 'facet'
+=head2 I<facet>
 
-A B<value space> can contain many facets. Facets are the building blocks of any B<value space>. Matching a regex, beeing not C<undef>, the size of a string can be a facet. Sticking to this concept, you have high level of code reuse and it helps to debug problem during testing a value against a B<value space>. Because many B<datatypes> share a common set of characterstics, facets can be reused. The implementation of the C<summary()> function requires facets (L<summary()>).
+A B<value space> can contain many facets. Facets are the building blocks of any B<value space>. Matching a regex, beeing not C<undef>, the size of a string can be a facet. Sticking to this concept, you have high level of code reuse and it helps to debug problem during testing a value against a B<value space>. Because many B<datatypes> share a common set of characterstics, facets can be reused. The implementation of the C<summary()> function requires facets (L<summary()|Data::Type/"$scalar = summary( $value, @types )">).
 
-=item 'anonymous or private facet'
-The implemention of C<summary> required use of facets. Even they arent very reusable by other datatypes. For this you should create <anonymous facets> or C<private facets>. Per convention there names start with '__'. Example:
+=head2 I<anonymous> or I<private facet>
+
+The implemention of C<summary> required use of facets. Even they rediculously easy. For this you should create I<anonymous facets> or I<private facets>. There name should start with '__'. Example:
 
  {
    package Data::Type::Object::email;
@@ -91,28 +74,21 @@ The implemention of C<summary> required use of facets. Even they arent very reus
 
 [Note] I really recommend this.
 
-=item 'filter'
+=head2 I<filter>
 
-This is just a cleanser. It reformats or removes insignficant parts of the initial value. Like stripping whitespaces or modifying cases.
+This is just a cleanser. It reformats or removes insignficant parts of the initial value. Like stripping whitespaces or modifying cases. There are some fundamental within L<Data::Type::Filer>.
 
-=item 'collection'
+=head2 I<collection>
 
 Within this distribution a collection is just a namespace. They reside undes C<Data::Type::Collection::<name>>. They group certain datatypes into a homogeneous collection with an unified interface and behaviour. It has also a common prefix for the datatype qualification i.e. Datatypes belonging to the C<W3C> collection begin with C<W3C::>. With C<use Data::Type ':all +W3C'> (note: unimplemented yet) you can load additional collections which arent loaded by default (Only the 'Std' collection is loaded by default).
-
-=back
-
-=back
-
-[Note] This module should have been C<Value::Type>, but i stick to C<Data::Type> until i get doomed.
 
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
 
-=cut

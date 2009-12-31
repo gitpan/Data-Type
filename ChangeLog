@@ -203,3 +203,10 @@
 	moved Data::Type::Exception related objects to Data/Type/Exception.pm
 
 	added the HTML type (thanks to HMTM::Lint)
+
+	Rename/prefixed the Data::Type::Object:: packages with std_ for Collection
+	  - STD::, W3C::, BIO::, CHEM:: and DB::
+
+0.02.01
+
+    [Major] Data::Type::Regex moved to a independant module "Regexp::Box". See CPAN.

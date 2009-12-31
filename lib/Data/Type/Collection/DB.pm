@@ -1,8 +1,7 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Collection::DB::Interface;
 
     our @ISA = qw(Data::Type::Object::Interface);
@@ -11,25 +10,13 @@ package Data::Type::Collection::DB::Interface;
 
     sub prefix : method { 'DB::' }
 
+    sub pkg_prefix : method { 'db_' }
+
     sub desc { 'Database' }
 
     sub doc { 'Database types.' }
 
     # Add Regex's to existing one
-
-package Data::Type::Regex;
-
-    register 'mysql_date', exact( qr/\d{4}-[01]\d-[0-3]\d/ ), 'a date as described in the mysql doc';
-
-    register 'mysql_datetime', exact( qr/\d{4}-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/ ), 'a datetime as described in the mysql doc';
-
-    register 'mysql_timestamp',  exact( qr/[1-2][9|0][7-9,0-3][0-7]-[01]\d-[0-3]\d [0-2]\d:[0-6]\d:[0-6]\d/ ), 'a timestamp as described in the mysql doc';
-
-    register 'mysql_time', exact( qr/-?\d{3,3}:[0-6]\d:[0-6]\d/ ), 'a time as described in the mysql doc';
- 
-    register 'mysql_year4', exact( qr/[0-2][9,0,1]\d\d/ ), 'as described in the mysql doc';
-
-    register 'mysql_year2', exact( qr/\d{2,2}/ ), 'as described in the mysql doc';
 
 package Data::Type::Collection::DB::Interface::Mysql;
 
@@ -43,7 +30,7 @@ package Data::Type::Collection::DB::Interface::Mysql;
 # Database Types
 #
 
-package Data::Type::Object::varchar;
+package Data::Type::Object::db_varchar;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::String);
 
@@ -67,7 +54,7 @@ package Data::Type::Object::varchar;
 		Data::Type::ok( 1, Data::Type::Facet::less( $this->[0]+1 ) );
 	}
 
-package Data::Type::Object::date_mysql;
+package Data::Type::Object::db_date_mysql;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Temporal);
 
@@ -94,13 +81,13 @@ package Data::Type::Object::date_mysql;
 		return q{DATE() emulates MYSQL builtin datatype};
 	}
 
+	sub _filters : method { return ( [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'chomp' ] );
-	
-			Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_date' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/date' ) );
 	}
 
 package Data::Type::Object::db_datetime;
@@ -126,10 +113,10 @@ our $VERSION = '0.01.25';
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_datetime' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/datetime' ) );
 	}
 
-package Data::Type::Object::timestamp;
+package Data::Type::Object::db_timestamp;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Temporal);
 
@@ -147,14 +134,14 @@ sub export : method { ( 'TIMESTAMP') }
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_timestamp' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/timestamp' ) );
 	}
 
 package Data::Type::Object::db_time;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Temporal);
 
-our $VERSION = '0.01.25';
+	our $VERSION = '0.01.25';
 
         sub export : method { ( 'TIME' ) }
 
@@ -168,10 +155,10 @@ our $VERSION = '0.01.25';
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_time' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/time' ) );
 	}
 
-package Data::Type::Object::year;
+package Data::Type::Object::db_year;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Temporal);
 
@@ -198,17 +185,17 @@ package Data::Type::Object::year;
 			{
 					#1970-2069 if you use the 2-digit format (70-69);
 
-				Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_year2' ) );
+				Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/year2' ) );
 			}
 			else
 			{
 					#The allowable values are 1901 to 2155, 0000 in the 4-digit
 
-				Data::Type::ok( 1, Data::Type::Facet::match( 'mysql_year4' ) );
+				Data::Type::ok( 1, Data::Type::Facet::match( 'db/mysql/year4' ) );
 			}
 	}
 
-package Data::Type::Object::tinytext;
+package Data::Type::Object::db_tinytext;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::String);
 
@@ -232,7 +219,7 @@ package Data::Type::Object::tinytext;
 		Data::Type::ok( 1, Data::Type::Facet::less( 255+1 ) );
 	}
 
-package Data::Type::Object::text;
+package Data::Type::Object::db_text;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::String);
 
@@ -256,7 +243,7 @@ package Data::Type::Object::text;
 		Data::Type::ok( 1, Data::Type::Facet::less( 65535+1 ) );
 	}
 
-package Data::Type::Object::mediumtext;
+package Data::Type::Object::db_mediumtext;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::String);
 
@@ -280,7 +267,7 @@ package Data::Type::Object::mediumtext;
 		Data::Type::ok( 1, Data::Type::Facet::less( 16777215+1 ) );
 	}
 
-package Data::Type::Object::longtext;
+package Data::Type::Object::db_longtext;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::String);
 
@@ -304,7 +291,7 @@ package Data::Type::Object::longtext;
 		Data::Type::ok( 1, Data::Type::Facet::less( 4294967295+1 ) );
 	}
 
-package Data::Type::Object::enum;
+package Data::Type::Object::db_enum;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Logic);
 
@@ -332,7 +319,7 @@ package Data::Type::Object::enum;
 			Data::Type::ok( 1, Data::Type::Facet::exists( [ @$this ] ) );
 	}
 
-package Data::Type::Object::set;
+package Data::Type::Object::db_set;
 
 	our @ISA = qw(Data::Type::Collection::DB::Interface::Mysql Data::Type::Collection::Std::Interface::Logic);
 	
@@ -379,8 +366,6 @@ package Data::Type::Object::set;
 
 __END__
 
-=pod
-
 =head1 NAME
 
 Data::Type::Collection::DB - types from databases
@@ -412,105 +397,73 @@ Example:
 =head1 TYPES
 
 
-=head2 DB::DATE
+=head2 DB::DATE (since 0.01.01)
 
 flexible date
 
-=over 2
-
-=item VERSION
-
-0.01.01
-
-=item USAGE
+=head3 Usage
 
 DATE() emulates MYSQL builtin datatype
 
-=item DEPENDS
+=head3 Depends
 
 L<Date::Parse>
 
-=back
-
-=head2 DB::DATETIME
+=head2 DB::DATETIME (since 0.01.25)
 
 date and time combination
 
-=head2 DB::TIME
-
-time
-
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item USAGE
-
-[RANGE] ('-838:59:59' to '838:59:59')
-
-=back
-
-=head2 DB::ENUM
+=head2 DB::ENUM (since 0.01.25)
 
 Mysql
 
-=head2 DB::LONGTEXT
+=head2 DB::LONGTEXT (since 0.01.25)
 
 long text
 
-=head2 DB::MEDIUMTEXT
+=head2 DB::MEDIUMTEXT (since 0.01.25)
 
 medium text
 
-=head2 DB::SET
+=head2 DB::SET (since 0.01.25)
 
 set of strings
 
-=head2 DB::TEXT
+=head2 DB::TEXT (since 0.01.25)
 
 "BLOB" sized dataset
 
-=head2 DB::TIMESTAMP
+=head2 DB::TIME (since 0.01.25)
+
+time
+
+=head3 Usage
+
+[RANGE] ('-838:59:59' to '838:59:59')
+
+=head2 DB::TIMESTAMP (since 0.01.25)
 
 timestamp
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item USAGE
+=head3 Usage
 
 [RANGE] ('1970-01-01 00:00:00' to sometime in the year 2037)
 
-=back
-
-=head2 DB::TINYTEXT
+=head2 DB::TINYTEXT (since 0.01.25)
 
 tiny text
 
-=head2 DB::VARCHAR
+=head2 DB::VARCHAR (since 0.01.25)
 
 string with a limited length
 
-=head2 DB::YEAR
+=head2 DB::YEAR (since 0.01.25)
 
 year
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item USAGE
+=head3 Usage
 
 The allowable values are 1901 to 2155, 0000 in the 4-digit year format, and 1970-2069 if you use the 2-digit format (70-69) (default is 4-digit)
-
-=back
 
 
 
@@ -519,11 +472,9 @@ The allowable values are 1901 to 2155, 0000 in the 4-digit year format, and 1970
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

@@ -1,7 +1,9 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
+
+use Carp qw(croak);
 
 package Data::Type::Tied;
 
@@ -87,9 +89,9 @@ package Data::Type::Tied;
 
 		foreach my $xref ( @_ )
 		{
-			ref($xref) or croak( sprintf "typ: %s reference detected, instead of a reference.", lc( ref($xref) || 'no' ) );
+			ref($xref) or ::croak( sprintf "typ: %s reference detected, instead of a reference.", lc( ref($xref) || 'no' ) );
 
-			$type->isa( 'Data::Type::Object::Interface' ) or croak( sprintf "typed( ref, TYPE ) expects a Data::Type TYPE as second argument. You supplied '%s' which is not.", $type );
+			$type->isa( 'Data::Type::Object::Interface' ) or ::croak( sprintf "typed( ref, TYPE ) expects a Data::Type TYPE as second argument. You supplied '%s' which is not.", $type );
 
 			tie $$xref, 'Data::Type::Tied', $type;
 
@@ -126,7 +128,7 @@ Data::Type::Tied - bind variables to datatypes
 
   try
   {
-    typ ENUM( qw(DNA RNA) ), \( my $a, my $b );
+    typ STD::ENUM( qw(DNA RNA) ), \( my $a, my $b );
 
     print "a is typ'ed" if istyp( $a );
 
@@ -145,15 +147,11 @@ Data::Type::Tied - bind variables to datatypes
 
 A tie-interface for Data::Type's is introduced via C<typ()>. Once a variable is typ'ed, C<valid()> is called in the background for every fetch on the value.
 
-=over 2
+=head2 FUNCTIONS
 
-=item FUNCTIONS
+=head3 typ( $type, @ref_variables )
 
-=over 2 
-
-=item typ( $type, @ref_variables )
-
-Once an invalid value was assigned to a C<typ>'ed var an exception gets thrown, so place your code in a try+catch block to handle that correctly. To unglue a variable from its type use L<untyp()> (see below). C<@ref_variables> may be a list of references which suite to the $type used. Mostly its a reference to a scalar.
+Once an invalid value was assigned to a C<typ>'ed var an exception gets thrown, so place your code in a try+catch block to handle that correctly. To unglue a variable from its type use C<untyp()> (see below). C<@ref_variables> may be a list of references which suite to the $type used. Mostly its a reference to a scalar.
 
   try
   {
@@ -168,7 +166,7 @@ Once an invalid value was assigned to a C<typ>'ed var an exception gets thrown, 
 
 [Advanced Note] C<typ> adds all references to a central registry and then C<tie>s them to L<Data::Type::Tied>. So don't use C<tie> directly, otherwise the other functions are confused and wont work.
 
-=item istyp( $type )
+=head3 $scalar = istyp( $type )
 
 C<typ>'d variables obscure themselfs, istyp() reveals $typed_var 's type. It does this via maintaining an internal registry of all typ'd varaibles.
 
@@ -177,34 +175,28 @@ C<typ>'d variables obscure themselfs, istyp() reveals $typed_var 's type. It doe
 		print "variable \$type is tied to $what";
 	}
 
-=item untyp( $sref )
+[Note] It is a synonym to B<tied>. See L<perltie>.
+
+=head3 untyp( $sref )
 
 Takes the typ constrains from a variable (like untie).
 
 	untyp( $sref );
 
-=back
-
-=back
+[Note] It is nearly a synonym to L<untie>, but also updates the internal registry.
 
 =head1 EXPORT
 
 None per default.
 
-=over 3
-
-=item FUNCTIONS
-
-C<typ>, C<untyp> and C<istyp>.
+=head2 FUNCTIONS
 
 B<':all'> loads qw(typ untyp istyp).
-
-=back
 
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 

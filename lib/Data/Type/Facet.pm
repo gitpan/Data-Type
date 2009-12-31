@@ -1,8 +1,7 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Facet::Exception;
 
       	Class::Maker::class
@@ -12,7 +11,7 @@ package Data::Type::Facet::Exception;
 
 package Data::Type::Facet::Interface;
 
-	use Attribute::Abstract;
+	use Attribute::Util;
 
 	sub test : Abstract method;
 
@@ -101,7 +100,14 @@ package Data::Type::Facet::ref;
 	{
 		my $this = shift;
 
-		throw Data::Type::Facet::Exception( text => 'not a reference' ) unless ref( $Data::Type::value );
+		if( $this->[0] )
+		{
+			throw Data::Type::Facet::Exception( text => 'not a reference' ) unless ref( $Data::Type::value );
+		}
+		else
+		{
+			throw Data::Type::Facet::Exception( text => sprintf 'not a reference to "%s"', $this->[0] ) unless $this->[0] eq ref( $Data::Type::value );
+		}
 	}
 
 package Data::Type::Facet::range;
@@ -215,11 +221,11 @@ package Data::Type::Facet::match;
 
 	our $VERSION = '0.01.01';
 
-	sub desc : method { 'matches regexp (registered with Data::Type::Regexp)' }
+	sub desc : method { 'matches regexp (registered within $Data::Type::rebox. Read Data::Type::Docs::RFC.)' }
 
 	sub usage : method
 	{
-		return 'match( REGEX_REGISTRY_KEY ) 	REGEX_REGISTRY_KEY is a key from Data::Type::Regex::_registry'
+		return 'match( REGEXP_BOX_ID ) 	REGEXP_BOX_ID is a key from Data::Type::rebox'
 	}
 	
 	sub test : method
@@ -228,11 +234,20 @@ package Data::Type::Facet::match;
 
 		Data::Type::Facet::defined->test;
 			
-#		warn sprintf "FACET match %s value '%s' with $this->[0]", defined( $Data::Type::value ) ? 'defined' : 'undefined', $Data::Type::value;
-		
-		unless( $Data::Type::value =~ Data::Type::Regex->request( $this->[0], 'regex', @$this ) )
+		if( $Data::Type::DEBUG )
 		{
-		    throw Data::Type::Facet::Exception( text => Data::Type::Regex->request( $this->[0], 'desc', @$this ) ) ;
+			warn sprintf "FACET match %s value '%s' with $this->[0] (regexp '%s')", 
+			
+				defined( $Data::Type::value ) ? 'defined' : 'undefined', 
+
+				$Data::Type::value,
+
+				$Data::Type::rebox->request( $this->[0], 'regexp', @$this );
+		}
+		
+		unless( $Data::Type::value =~ $Data::Type::rebox->request( $this->[0], 'regexp', @$this ) )
+		{
+		    throw Data::Type::Facet::Exception( text => $Data::Type::rebox->request( $this->[0], 'desc', @$this ) ) ;
 		}
 	}
 
@@ -240,7 +255,7 @@ package Data::Type::Facet::match;
 	{
 		my $this = shift;
 
-	return sprintf 'matching a regular expression for %s', Data::Type::Regex->request( $this->[0], 'desc', @$this );
+	return sprintf 'matching a regular expression for %s', $Data::Type::rebox->request( $this->[0], 'desc', @$this );
 	}
 
 package Data::Type::Facet::is;
@@ -299,7 +314,22 @@ package Data::Type::Facet::bool;
 	{
 		my $this = shift;
 
-		    throw Data::Type::Facet::Exception( text => "not boolean $this->[0]" ) unless $this->[0];
+		my $p = 'true';
+
+		$p = $this->[0];
+
+		if( $p eq 'true' )
+		{
+		    throw Data::Type::Facet::Exception( text => "not boolean $p" ) unless $Data::Type::value;
+		}
+		elsif( $p eq 'false' )
+		{
+		    throw Data::Type::Facet::Exception( text => "boolean $p" ) if $Data::Type::value;
+		}
+		else
+		{
+	            die "Data::Type::Facet::bool argument is '$p'. But usage is bool( 'true' | 'false' ).";
+		}
 	}
 
 	sub info : method
@@ -416,6 +446,9 @@ package Data::Type::Facet::mod10check;
 		return 'LUHN formula (mod 10) for validation of creditcards';
 	}
 
+  # To be implemented and not yet really usefull yet.
+  # 
+
 package Data::Type::Facet::file;
 
 	our @ISA = qw(Data::Type::Facet::Interface);
@@ -432,6 +465,8 @@ package Data::Type::Facet::file;
 	{
 		my $this = shift;
 
+    			throw Data::Type::Facet::Exception( text => 'undefined value' ) unless defined $Data::Type::value;
+
 			throw Data::Type::Facet::Exception(
 
 			    text => 'supplied filename does not exist',
@@ -441,37 +476,114 @@ package Data::Type::Facet::file;
 			    type => __PACKAGE__
 
 			) unless -e $Data::Type::value;
-
-    			throw Data::Type::Facet::Exception( text => 'undefined value' ) unless defined $Data::Type::value;
-
-			unless( $Data::Type::value =~ Data::Type::Regex->request( $this->[0], 'regex', @$this ) )
-			{
-    				throw Data::Type::Facet::Exception( text => Data::Type::Regex->request( $this->[0], 'desc', @$this ) ) ;
-			}
 	}
 
 1;
 
 __END__
 
-=pod
-
 =head1 NAME
 
 Data::Type::Facet - a subelement of a type
 
+=head1 SYNOPSIS
+
+  package Data::Type::Object::std_real;
+
+  ...
+
+   sub _test
+   {
+     my $this = shift;
+
+       Data::Type::ok( 1, Data::Type::Facet::match( 'std/real' ) );
+   }
+
+=head1 DESCRIPTION
+
+Facets are bric's for L<Data::Type::Object>'s. They are partially almost trivial (more or less), but have some advantages. They are modularising the testing procedure of any datatype (and therefore giving the magic to the L<Data::Type/summary()> function.
+
 =head1 EXCEPTIONS
 
-Data::Type::Facet::Exception
+L<Data::Type::Facet::Exception> is thrown by any facet to indicate L<Data::Type> that it failed to pass.
+
+=head1 FACETS
+
+=head2 Data::Type::Facet::ref( I<type> )
+
+  Data::Type::Facet::ref();
+  Data::Type::Facet::ref( 'ARRAY' );  # 'HASH' | 'CODE' | ..
+
+Whether the value is a reference. If I<type> is given, this explicit reference is required. So if C<$Data::Type::value = [ 1, 2 ]> then
+
+  ok( 1, Data::Type::Facet::ref( 'ARRAY' ) );
+
+would pass. While
+
+  ok( 1, Data::Type::Facet::ref( 'HASH' ) );
+
+would of course not.
+
+=head2 Data::Type::Facet::range( I<x>, I<y> )
+
+  Data::Type::Facet::range( 1, 10 )
+
+Value is numerically between the lower value I<x> and upper limit value I<y> (including them).
+
+=head2 Data::Type::Facet::lines( I<min> ) 	
+
+Counts the newlines C<\n> in a textblock. Expects more then I<min> lines (newlines).
+
+=head2 Data::Type::Facet::less( I<min> )
+
+Counts the C<length()> of a string and expects less than C<min>.
+
+=head2 Data::Type::Facet::max( I<limit> )
+
+Expects numbers under the I<limit> (E<lt> I<limit>).
+
+=head2 Data::Type::Facet::min( I<limit> )
+
+Expects numbers above I<limit> (E<gt> I<limit>).
+
+=head2 Data::Type::Facet::match( I<boxid> )
+
+  Data::Type::Facet::match( 'std/word' );
+
+Please visit L<Data::Type::Docs::RFC/CONVENTIONS> and L<Regexp::Box> for details registering regexps. All regexps used by L<Data::Type> are stored within the central registry C<$Data::Type::rebox> (L<Regexp::Box>). The I<boxid> must be therefore e prior registered to C<$Data::Type::rebox>. The already stored one can be retrieven with L<Data::Type::Query>.
+
+=head2 Data::Type::Facet::is()
+
+Expects an exact match (C<==>).
+
+=head2 Data::Type::Facet::defined()
+
+Expects a defined value (as perl's C<defined()>).
+
+=head2 Data::Type::Facet::null()
+
+Expects not literally 'NULL'. Its test C<eq 'NULL'>.
+
+=head2 Data::Type::Facet::bool( 'true' | 'false' )
+
+  Data::Type::Facet::bool( 'true' );
+
+Expects true or false boolean value.
+
+=head2 Data::Type::Facet::exists( I<key | element> )
+
+This function expects array elements with an array or a hash key within a hash, dependant on the given C<$Data::Type::value>.
+
+=head2 Data::Type::Facet::mod10check()
+
+Expects a number (mostly a credit-card number) to pass the I<mod10 LUHN algorithm> check.
 
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

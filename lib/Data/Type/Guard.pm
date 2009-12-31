@@ -1,8 +1,7 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Guard;
 
 	use Carp;
@@ -126,7 +125,7 @@ package Data::Type::Guard;
 
 1;
 
-=pod
+__END__
 
 =head1 NAME
 
@@ -140,10 +139,13 @@ Data::Type::Guard - inspects members of foreign objects
 
     tests =>
     {
-      email => EMAIL( 1 ), # mxcheck ON ! see Email::Valid
-      firstname => WORD,
-      social_id => [ NUM, VARCHAR( 10 ) ],
-      contacts => sub { my %args = @_; exists $args{lucy} },
+      email =>     STD::EMAIL( 1 ), # mxcheck ON ! see Email::Valid
+
+      firstname => STD::WORD,
+
+      social_id => [ STD::NUM, STD::VARCHAR( 10 ) ],
+
+      contacts =>   sub { my %args = @_; exists $args{lucy} },
     }
   );
 
@@ -151,47 +153,37 @@ Data::Type::Guard - inspects members of foreign objects
 
     # compact version
 
-  valid_object { email => EMAIL( 1 ), firstname => WORD }, $object_a, $object_b;
+  valid_object { email => STD::EMAIL( 1 ), firstname => STD::WORD }, $object_a, $object_b;
 
-=head1 DOCUMENATION
+=head1 INTRODUCTION
 
 This class inspects others objects member return-values for a specific datatype.
 
 =head1 API
 
-=over 2
-
-=item CONSTRUCTOR
+=head2 CONSTRUCTOR
 
  my $dtg = Data::Type::Guard->new( allow => $aref, tests => $href )
 
-=over 2
-
-=item allow => $aref
+=head3 allow => $aref
 
 If is set then the C<inspect> function below will return C<0> if the object is not a reference of the requested type. If empty, isn't selective for special references (  HASH, ARRAY, "CUSTOM", .. ). 
 
-=item tests => $href
+=head3 tests => $href
 
-Keys are the members names (anything that can be called via the $o->member syntax) and the type(s) as value. When a member should match multple types, they should be contained in an array reference ( i.e. 'fon' => [ qw(NUM TELEPHONE) ] ). Instead of types a reference to a sub is allowed, while it must return true if it matches (see L<valid_object>).
+Keys are the members names (anything that can be called via the $o->member syntax) and the type(s) as value. When a member should match multple types, they should be contained in an array reference ( i.e. 'fon' => [ qw(NUM TELEPHONE) ] ). Instead of types a reference to a sub is allowed, while it must return true if it matches (see L<valid_object()|/"valid_object( { member => TYPE, .. }, @objects )">).
 
-=back
+=head2 METHODS
 
-=item METHODS
-
-=over 2
-
-=item $dtg->inspect( $blessed )
+=head3 $dtg->inspect( $blessed )
 
 Accepts a blessed reference as a parameter. It returns C<0> if a guard test or type constrain will fail, otherwise C<1>.
 
 [Note] A more appropriate report on failure is planned.
 
-=item FUNCTIONS
+=head2 FUNCTIONS
 
-=over 3
-
-=item valid_object( { member => TYPE, .. }, @objects )
+=head3 valid_object( { member => TYPE, .. }, @objects )
 
 Valids members of objects against multiple 'types' or code reference. Any C<$object> must have an accessor function to its method (same as the key given in the C<member> C<$href>). See L<Data::Type::Guard> for oo-interface for that. 
 
@@ -199,13 +191,9 @@ Valids members of objects against multiple 'types' or code reference. Any C<$obj
 
   valid_object( { year => DATE( 'YEAR' ), owner_firstname => VARCHAR(20), speed => INT }, $car ) or die;
 
-=back
-
 =head1 AUTO DETECTION
 
-B<$Data::Type::Guard::AUTO_DETECT> controls if information from the reflection of an object is superseeding the B<tests =>> parameter. Visit L<Class::Maker> reflection manual ( for the C<types => {}> field ).
-
-Exampe:
+B<$Data::Type::Guard::AUTO_DETECT> controls if information from the reflection of an object is superseeding the B<tests =>> parameter. Visit L<Class::Maker> reflection manual ( for the C<types => {}> field ). Example:
 
  use Data::Type qw(:all);
 
@@ -240,24 +228,16 @@ Exampe:
 
 None per default.
 
-=over 3
-
-=item FUNCTIONS
-
 C<valid_object>.
 
 B<':all'> loads qw(valid_object)
 
-=back
-
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

@@ -1,19 +1,20 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Collection::W3C::Interface;
 
 use XML::Schema;
 
-use Attribute::Abstract;
+use Attribute::Util;
 
 our @ISA = qw(Data::Type::Object::Interface);
 
 our $VERSION = '0.01.25';
 
 sub prefix : method { 'W3C::' }
+
+sub pkg_prefix : method { 'w3c_' }
 
 sub basic_depends : method { qw(XML::Schema) }
 
@@ -523,7 +524,7 @@ Primitive datatypes
 
 =cut
 
-package Data::Type::Object::string;
+package Data::Type::Object::w3c_string;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -604,7 +605,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::boolean;
+package Data::Type::Object::w3c_boolean;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -690,7 +691,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::decimal;
+package Data::Type::Object::w3c_decimal;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -776,7 +777,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::float;
+package Data::Type::Object::w3c_float;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -860,7 +861,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::double;
+package Data::Type::Object::w3c_double;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -944,7 +945,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::duration;
+package Data::Type::Object::w3c_duration;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1028,7 +1029,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::datetime;
+package Data::Type::Object::w3c_datetime;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1112,7 +1113,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::time;
+package Data::Type::Object::w3c_time;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1196,7 +1197,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::date_w3c;
+package Data::Type::Object::w3c_date_w3c;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1256,7 +1257,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::gyearmonth;
+package Data::Type::Object::w3c_gyearmonth;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1340,7 +1341,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::gyear;
+package Data::Type::Object::w3c_gyear;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1424,7 +1425,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::gmonthday;
+package Data::Type::Object::w3c_gmonthday;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1508,7 +1509,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::gday;
+package Data::Type::Object::w3c_gday;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1592,7 +1593,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::gmonth;
+package Data::Type::Object::w3c_gmonth;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1676,7 +1677,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::hexbinary;
+package Data::Type::Object::w3c_hexbinary;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1759,7 +1760,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::base64binary;
+package Data::Type::Object::w3c_base64binary;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1841,7 +1842,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::anyuri;
+package Data::Type::Object::w3c_anyuri;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -1922,7 +1923,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::qname;
+package Data::Type::Object::w3c_qname;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -2004,7 +2005,7 @@ sub def { return << 'ENDE';
 ENDE
 }
 
-package Data::Type::Object::notation;
+package Data::Type::Object::w3c_notation;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Primitive);
 
@@ -2127,7 +2128,7 @@ ENDE
 
 =cut
 
-package Data::Type::Object::normalizedstring;
+package Data::Type::Object::w3c_normalizedstring;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2166,7 +2167,7 @@ sub def {  return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::token;
+package Data::Type::Object::w3c_token;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2205,7 +2206,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::language;
+package Data::Type::Object::w3c_language;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2251,7 +2252,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::nmtoken;
+package Data::Type::Object::w3c_nmtoken;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2296,7 +2297,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::nmtokens;
+package Data::Type::Object::w3c_nmtokens;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2380,7 +2381,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::name;
+package Data::Type::Object::w3c_name;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2425,7 +2426,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::ncname;
+package Data::Type::Object::w3c_ncname;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2470,7 +2471,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::id;
+package Data::Type::Object::w3c_id;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2507,7 +2508,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::idref;
+package Data::Type::Object::w3c_idref;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2544,7 +2545,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::idrefs;
+package Data::Type::Object::w3c_idrefs;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2627,7 +2628,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::entity;
+package Data::Type::Object::w3c_entity;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2664,7 +2665,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::entities;
+package Data::Type::Object::w3c_entities;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2747,7 +2748,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::integer;
+package Data::Type::Object::w3c_integer;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2787,7 +2788,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::nonpositiveinteger;
+package Data::Type::Object::w3c_nonpositiveinteger;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2826,7 +2827,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::negativeinteger;
+package Data::Type::Object::w3c_negativeinteger;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2865,7 +2866,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::long;
+package Data::Type::Object::w3c_long;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2913,7 +2914,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::int_w3c;
+package Data::Type::Object::w3c_int;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2953,7 +2954,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::short;
+package Data::Type::Object::w3c_short;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -2993,7 +2994,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::byte;
+package Data::Type::Object::w3c_byte;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3033,7 +3034,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::nonnegativeinteger;
+package Data::Type::Object::w3c_nonnegativeinteger;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3072,7 +3073,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::unsignedlong;
+package Data::Type::Object::w3c_unsignedlong;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3119,7 +3120,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::unsignedint;
+package Data::Type::Object::w3c_unsignedint;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3158,7 +3159,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::unsignedshort;
+package Data::Type::Object::w3c_unsignedshort;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3197,7 +3198,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::unsignedbyte;
+package Data::Type::Object::w3c_unsignedbyte;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3236,7 +3237,7 @@ sub def { return <<'ENDE';
 ENDE
 }
 
-package Data::Type::Object::positiveinteger;
+package Data::Type::Object::w3c_positiveinteger;
 
     our @ISA = qw(Data::Type::Collection::W3C::Interface::Derived);
 
@@ -3275,8 +3276,6 @@ ENDE
 
 1;
 
-=pod
-
 =head1 NAME
 
 Data::Type::Collection::W3C - set of data types from the W3C XML Schema spec
@@ -3284,179 +3283,179 @@ Data::Type::Collection::W3C - set of data types from the W3C XML Schema spec
 =head1 TYPES
 
 
-=head2 W3C::ANYURI
+=head2 W3C::ANYURI (since 0.01.25)
 
 anyURI (3.2.17)
 
-=head2 W3C::BASE64BINARY
+=head2 W3C::BASE64BINARY (since 0.01.25)
 
 base64Binary (3.2.16)
 
-=head2 W3C::BOOLEAN
+=head2 W3C::BOOLEAN (since 0.01.25)
 
 boolean (3.2.2)
 
-=head2 W3C::BYTE
+=head2 W3C::BYTE (since 0.01.25)
 
 byte (3.3.19)
 
-=head2 W3C::DATE
+=head2 W3C::DATE (since 0.01.25)
 
 date (3.2.9)
 
-=head2 W3C::DATETIME
+=head2 W3C::DATETIME (since 0.01.25)
 
 dateTime (3.2.7)
 
-=head2 W3C::DECIMAL
+=head2 W3C::DECIMAL (since 0.01.25)
 
 decimal (3.2.3)
 
-=head2 W3C::DOUBLE
+=head2 W3C::DOUBLE (since 0.01.25)
 
 double (3.2.5)
 
-=head2 W3C::DURATION
+=head2 W3C::DURATION (since 0.01.25)
 
 duration (3.2.6)
 
-=head2 W3C::ENTITIES
+=head2 W3C::ENTITIES (since 0.01.25)
 
 ENTITIES (3.3.12)
 
-=head2 W3C::ENTITY
+=head2 W3C::ENTITY (since 0.01.25)
 
 ENTITY (3.3.11)
 
-=head2 W3C::FLOAT
+=head2 W3C::FLOAT (since 0.01.25)
 
 float (3.2.4)
 
-=head2 W3C::GDAY
+=head2 W3C::GDAY (since 0.01.25)
 
 gDay (3.2.13)
 
-=head2 W3C::GMONTH
+=head2 W3C::GMONTH (since 0.01.25)
 
 gMonth (3.2.14)
 
-=head2 W3C::GMONTHDAY
+=head2 W3C::GMONTHDAY (since 0.01.25)
 
 gMonthDay (3.2.12)
 
-=head2 W3C::GYEAR
+=head2 W3C::GYEAR (since 0.01.25)
 
 gYear (3.2.11)
 
-=head2 W3C::GYEARMONTH
+=head2 W3C::GYEARMONTH (since 0.01.25)
 
 gYearMonth (3.2.10)
 
-=head2 W3C::HEXBINARY
+=head2 W3C::HEXBINARY (since 0.01.25)
 
 hexBinary (3.2.15)
 
-=head2 W3C::ID
+=head2 W3C::ID (since 0.01.25)
 
 ID (3.3.8)
 
-=head2 W3C::IDREF
+=head2 W3C::IDREF (since 0.01.25)
 
 IDREF (3.3.9)
 
-=head2 W3C::IDREFS
+=head2 W3C::IDREFS (since 0.01.25)
 
 IDREFS (3.3.10)
 
-=head2 W3C::INT
+=head2 W3C::INT (since 0.01.25)
 
 int (3.3.17)
 
-=head2 W3C::INTEGER
+=head2 W3C::INTEGER (since 0.01.25)
 
 integer (3.3.13)
 
-=head2 W3C::LANGUAGE
+=head2 W3C::LANGUAGE (since 0.01.25)
 
 language (3.3.3)
 
-=head2 W3C::LONG
+=head2 W3C::LONG (since 0.01.25)
 
 long (3.3.16)
 
-=head2 W3C::NAME
+=head2 W3C::NAME (since 0.01.25)
 
 Name (3.3.6)
 
-=head2 W3C::NCNAME
+=head2 W3C::NCNAME (since 0.01.25)
 
 NCName (3.3.7)
 
-=head2 W3C::NEGATIVEINTEGER
+=head2 W3C::NEGATIVEINTEGER (since 0.01.25)
 
 negativeInteger (3.3.15)
 
-=head2 W3C::NMTOKEN
+=head2 W3C::NMTOKEN (since 0.01.25)
 
 NMTOKEN (3.3.4)
 
-=head2 W3C::NMTOKENS
+=head2 W3C::NMTOKENS (since 0.01.25)
 
 NMTOKENS (3.3.5)
 
-=head2 W3C::NONNEGATIVEINTEGER
+=head2 W3C::NONNEGATIVEINTEGER (since 0.01.25)
 
 nonNegativeInteger (3.3.20)
 
-=head2 W3C::NONPOSITIVEINTEGER
+=head2 W3C::NONPOSITIVEINTEGER (since 0.01.25)
 
 nonPositiveInteger (3.3.14)
 
-=head2 W3C::NORMALIZEDSTRING
+=head2 W3C::NORMALIZEDSTRING (since 0.01.25)
 
 normalizedString (3.3.1)
 
-=head2 W3C::NOTATION
+=head2 W3C::NOTATION (since 0.01.25)
 
 NOTATION (3.2.19)
 
-=head2 W3C::POSITIVEINTEGER
+=head2 W3C::POSITIVEINTEGER (since 0.01.25)
 
 positiveInteger (3.3.25)
 
-=head2 W3C::QNAME
+=head2 W3C::QNAME (since 0.01.25)
 
 QName (3.2.18)
 
-=head2 W3C::SHORT
+=head2 W3C::SHORT (since 0.01.25)
 
 short (3.3.18)
 
-=head2 W3C::STRING
+=head2 W3C::STRING (since 0.01.25)
 
 string (3.2.1)
 
-=head2 W3C::TIME
+=head2 W3C::TIME (since 0.01.25)
 
 time (3.2.8)
 
-=head2 W3C::TOKEN
+=head2 W3C::TOKEN (since 0.01.25)
 
 token (3.3.2)
 
-=head2 W3C::UNSIGNEDBYTE
+=head2 W3C::UNSIGNEDBYTE (since 0.01.25)
 
 unsignedByte (3.3.24)
 
-=head2 W3C::UNSIGNEDINT
+=head2 W3C::UNSIGNEDINT (since 0.01.25)
 
 unsignedInt (3.3.22)
 
-=head2 W3C::UNSIGNEDLONG
+=head2 W3C::UNSIGNEDLONG (since 0.01.25)
 
 unsignedLong (3.3.21)
 
-=head2 W3C::UNSIGNEDSHORT
+=head2 W3C::UNSIGNEDSHORT (since 0.01.25)
 
 unsignedShort (3.3.23)
 
@@ -3467,11 +3466,9 @@ unsignedShort (3.3.23)
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

@@ -1,11 +1,10 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Filter::Interface;
 
-	use Attribute::Abstract;
+	use Attribute::Util;
 
 	sub desc : Abstract method;
 
@@ -36,9 +35,9 @@ package Data::Type::Filter::lc;
 
 	our $VERSION = '0.01.25';
 
-	sub desc : method { 'lower case' }
+	sub desc : method { 'lowers case' }
 
-	sub info : method { 'lower cases' }
+	sub info : method { 'lowers cases' }
 
 	sub filter : method
 	{
@@ -53,7 +52,7 @@ package Data::Type::Filter::uc;
 
 	our $VERSION = '0.01.25';
 
-	sub desc : method { 'upper case' }
+	sub desc : method { 'upper cases' }
 
 	sub info : method { 'upper cases via "uc"' }
 
@@ -92,7 +91,7 @@ package Data::Type::Filter::collapse;
 
 	sub desc : method { 'collapses repeats' }
 
-	sub info : method { 'collapses any arbitrary repeats of characters to single representation' }
+	sub info : method { 'collapses any arbitrary repeats of characters to a single' }
 
 	sub filter : method
 	{
@@ -102,50 +101,74 @@ package Data::Type::Filter::collapse;
 
 		$Data::Type::value =~ s/$what{2,}/$what/go;
 	}
-
 1;
 
 __END__
 
-=pod
-
 =head1 NAME
 
-Data::Type::Filter - cleans values before subjecting to facets
+Data::Type::Filter - cleans values before normally subjecting to facets
 
-=head1 INTERFACE
+=head1 SYNOPSIS
 
-=over 3
+  package Data::Type::Object::std_langcode;
 
-=item * 
-Data::Type::Filter::Interface
+    ...
 
-=over 4
+    sub _filters : method 
+    { 
+       return ( [ 'strip', '\s' ], [ 'chomp' ], [ 'lc' ] ) 
+    }
 
-=item -
-$VERSION
+=head1 EXAMPLE
 
-=item -
-sub desc : Abstract method;
+  package Data::Type::Filter::chomp;
 
-=item -
-sub info : Abstract method;
+    our @ISA = ( 'Data::Type::Filter::Interface' );
 
-=item -
-sub filter : Abstract method;
+    our $VERSION = '0.01.25';
 
-=back
+    sub desc : method { 'chomps' }
 
-=back
+    sub info : method { 'chomps' }
+    
+    sub filter : method
+    {
+       my $this = shift;
+
+       chomp $Data::Type::value;
+    }
+
+=head1 FILTERS
+
+=head2 Data::Type::Filter::chomp
+
+Chomps (as perl C<chomp()>).
+
+=head2 Data::Type::Filter::lc
+
+Lower cases (as perl C<lc()>).
+
+=head2 Data::Type::Filter::uc
+
+Upper cases (as perl C<uc()>).
+
+=head2 Data::Type::Filter::strip( I<what> )
+
+A simple s/I<what>// operation as
+
+   $Data::Type::value =~ s/$what//go;
+
+=head2 Data::Type::Filter::collapse( I<what> )
+
+Collapses any arbitrary repeats of I<what> to a single.
 
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

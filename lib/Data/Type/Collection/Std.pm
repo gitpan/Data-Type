@@ -1,8 +1,7 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 use strict;
 
 package Data::Type::Collection::Std::Interface;
@@ -13,27 +12,7 @@ package Data::Type::Collection::Std::Interface;
 
   sub prefix : method {'Std::'} 
 
-package Data::Type::Regex;
-
-  register( 'word', qr/[^\s]+/, 'set of non-spaces' );
-
-  register( 'binary', exact( qr/[01]+/ ), 'arbitrary combination of 0 and 1' );
-     
-  register( 'hex', exact( qr/[0-9a-fA-F]+/ ), 'hexadecimal string' );
-
-  register( 'int', exact( $RE{num}{int} ), 'integer' );
-     
-  register( 'real', exact( $RE{num}{real} ), 'real' );
-     
-  register( 'quoted', exact( $RE{quoted} ), 'string enclosed by matching quoting characters' );
-     
-  register( 'uri', sub { exact( $RE{URI}{HTTP}{ -scheme => $_[1] || 'HTTP' } ) }, sub { sprintf "an uri (default: %s)",  $_[1] || 'HTTP' } );
-     
-  register( 'net', sub { exact( $RE{net}{ $_[1] || 'IPv4' } ) }, 'IP (V4, V6, MAC) network address' );
-     
-  register( 'zip', sub { exact( $RE{zip}{ $_[1] || 'Germany' } ) }, sub { sprintf 'a zip %s code (default: german)', $_[1] || 'german' } );
-     
-  register( 'domain', $Regexp::Common::URI::RFC1035::domain, 'RFC1035 domain name' );
+  sub pkg_prefix : method {'std_'} 
 
 package Data::Type::Collection::Std::Interface::Numeric;
 
@@ -41,9 +20,7 @@ package Data::Type::Collection::Std::Interface::Numeric;
 
    sub desc : method { 'Numeric' }
 
-   sub doc : method { <<'END_HERE' }
-Number or related
-END_HERE
+   sub doc : method { q{Number or related} }
 
 package Data::Type::Collection::Std::Interface::Temporal;
 
@@ -93,22 +70,22 @@ package Data::Type::Collection::Std::Interface::Locale;
 	# Custom datatypes
 	#
 
-package Data::Type::Object::word;
+package Data::Type::Object::std_word;
 
-	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
+   our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
-	our $VERSION = '0.01.25';
+   our $VERSION = '0.01.25';
 
-	sub desc { 'word (without whitespaces)' }
+   sub desc { 'word (without whitespaces)' }
 
-	sub _test
- 	{
-		my $this = shift;
+   sub _test
+   {
+       my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'word' ) );
-	}
+       Data::Type::ok( 1, Data::Type::Facet::match( 'std/word' ) );
+   }
 
-package Data::Type::Object::bool;
+package Data::Type::Object::std_bool;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);
 	
@@ -130,7 +107,7 @@ package Data::Type::Object::bool;
             Data::Type::ok( $this->[0] eq 'true' ? 1 : 0, Data::Type::Facet::bool( $this->[0] ) );
 	}
 
-package Data::Type::Object::int;
+package Data::Type::Object::std_int;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);
 
@@ -146,10 +123,10 @@ package Data::Type::Object::int;
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'int' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'std/int' ) );
 	}
 
-package Data::Type::Object::num;
+package Data::Type::Object::std_num;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);
 
@@ -165,10 +142,10 @@ package Data::Type::Object::num;
 
 				# Here we test the hierarchy feature -> nested types !
 
-			Data::Type::Object::int->test( $Data::Type::value );
+			Data::Type::Object::std_int->test( $Data::Type::value );
 	}
 
-package Data::Type::Object::real;
+package Data::Type::Object::std_real;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);
 
@@ -184,10 +161,10 @@ package Data::Type::Object::real;
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'real' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'std/real' ) );
 	}
 
-package Data::Type::Object::quoted;
+package Data::Type::Object::std_quoted;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -203,10 +180,10 @@ package Data::Type::Object::quoted;
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'quoted' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'std/quoted' ) );
 	}
 
-package Data::Type::Object::gender;
+package Data::Type::Object::std_gender;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -237,17 +214,17 @@ package Data::Type::Object::gender;
 			Data::Type::ok( 1, Data::Type::Facet::exists( [ $this->param ] ) );
 	}
 
-package Data::Type::Object::gender_de;
+package Data::Type::Object::std_gender_de;
 
 	our $VERSION = '0.01.12';
 
-	our @ISA = qw(Data::Type::Object::gender);
+	our @ISA = qw(Data::Type::Object::std_gender);
 
 	sub export { ('GENDER::DE') }
 
 	sub param : method { ( 'weiblich', 'männlich' ) }
 
-package Data::Type::Object::yesno;
+package Data::Type::Object::std_yesno;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -271,18 +248,20 @@ package Data::Type::Object::yesno;
    	return $this->param;
    	}
 
+	sub _filters : method { return ( [ 'chomp' ], [ 'lc' ] ) }
+
 	sub _test : method
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'chomp' ], [ 'lc' ] );
+			# Data::Type->filter(  [ 'chomp' ], [ 'lc' ] );
 
 			Data::Type::ok( 1, Data::Type::Facet::exists( [ $this->param ] ) );
 	}
 
-package Data::Type::Object::yesno_de;
+package Data::Type::Object::std_yesno_de;
 
-	our @ISA = qw(Data::Type::Object::yesno);
+	our @ISA = qw(Data::Type::Object::std_yesno);
 
         our $VERSION = '0.01.14';
 
@@ -290,7 +269,7 @@ package Data::Type::Object::yesno_de;
 
 	sub param { qw(ja nein) }
 
-package Data::Type::Object::ref;
+package Data::Type::Object::std_ref;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -321,7 +300,7 @@ package Data::Type::Object::ref;
 			}
 	}
 
-package Data::Type::Object::creditcard;
+package Data::Type::Object::std_creditcard;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Business);
 
@@ -422,11 +401,11 @@ package Data::Type::Object::creditcard;
 
 	our $default_cc = 'VISA';
 
+	sub _filters : method { return ( [ 'strip', '\D' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'strip', '\D' ] );
 
 			printf "creditcard '%s' is about to be tested\n", $Data::Type::value if $Data::Type::debug;
 
@@ -470,10 +449,10 @@ package Data::Type::Object::creditcard;
 				}
 			}
 
-		throw Data::Type::Exception( text => "creditcard not valid" ) unless map { @{ $results->{$_} } == 0 ? 1 : () } keys %$results;
+		throw Data::Type::Exception( text => 'creditcard not valid' ) unless map { @{ $results->{$_} } == 0 ? 1 : () } keys %$results;
 	}
 
-package Data::Type::Object::binary;
+package Data::Type::Object::std_binary;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -489,10 +468,10 @@ package Data::Type::Object::binary;
 	{
 		my $this = shift;
 
-			Data::Type::ok( 1, Data::Type::Facet::match( 'binary' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'std/binary' ) );
 	}
 
-package Data::Type::Object::hex;
+package Data::Type::Object::std_hex;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -501,17 +480,17 @@ package Data::Type::Object::hex;
 	sub info : method { qq{hexadecimal code} }
 
 	sub usage { 'Set of ( ([0-9a-fA-F]) )' }
+
+	sub _filters : method { return ( [ 'strip', '\s' ] ) }
 	
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ] );
-
-		        Data::Type::ok( 1, Data::Type::Facet::match( 'hex' ) );
+		        Data::Type::ok( 1, Data::Type::Facet::match( 'std/hex' ) );
 	}
 
-package Data::Type::Object::langcode;
+package Data::Type::Object::std_langcode;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -532,16 +511,16 @@ package Data::Type::Object::langcode;
 
 	sub usage { '' }
 
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ], [ 'lc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ], [ 'lc' ]  );
-
 			Data::Type::ok( 1, Data::Type::Facet::exists( [ Locale::Language::all_language_codes() ] ) );
 	}
 
-package Data::Type::Object::langname;
+package Data::Type::Object::std_langname;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -553,16 +532,16 @@ package Data::Type::Object::langname;
 
 	sub info : method { qq{a language name} }
 
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
-
 			Data::Type::ok( 1, Data::Type::Facet::exists( [ Locale::Language::all_language_names() ] ) );
 	}
 
-package Data::Type::Object::issn;
+package Data::Type::Object::std_issn;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Business);
 
@@ -576,16 +555,16 @@ package Data::Type::Object::issn;
 
 	sub usage { 'example: 14565935' }
 
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
-
 			throw Data::Type::Facet::Exception() unless new Business::ISSN( $Data::Type::value )->is_valid;
 	}
 
-package Data::Type::Object::upc;
+package Data::Type::Object::std_upc;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Business);
 
@@ -598,17 +577,17 @@ package Data::Type::Object::upc;
 	sub info { qq{standard (type-A) Universal Product Code}	}
 
 	sub usage { 'i.e. 012345678905'	}
-	
+
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
+       
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
-
 			throw Data::Type::Facet::Exception() unless Business::UPC->new( $Data::Type::value )->is_valid;
 	}
 
-package Data::Type::Object::cins;
+package Data::Type::Object::std_cins;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Business);
 
@@ -622,18 +601,18 @@ package Data::Type::Object::cins;
 
 	sub usage { 'i.e. 035231AH2' }
 	
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
 
 			my $result = Business::CINS->new( $Data::Type::value )->error;
 			
 			throw Data::Type::Facet::Exception( text => $result ) if defined $result;
 	}
 
-package Data::Type::Object::defined;
+package Data::Type::Object::std_defined;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -650,7 +629,7 @@ package Data::Type::Object::defined;
 			Data::Type::ok( 1, Data::Type::Facet::defined() );
 	}
 
-package Data::Type::Object::email;
+package Data::Type::Object::std_email;
 
 {
     package Data::Type::Facet::__email;
@@ -683,7 +662,13 @@ package Data::Type::Object::email;
 
 	sub desc : method { 'email address' }
 
-        sub usage : method { 'EMAIL( [MXCHECK:BOOL] ); MXCHECK results in net use (see Email::Valid)' }
+        sub usage : method 
+        { 
+          return <<'END_HERE';
+[MXCHECK as STD::BOOL]
+  MXCHECK results actually tests the mx host via internet (see Email::Valid)
+END_HERE
+        }
 
         sub info
 	{
@@ -699,7 +684,7 @@ package Data::Type::Object::email;
 		Data::Type::ok( 1, Data::Type::Facet::__email( $this->[0] ) );
 	}
 
-package Data::Type::Object::uri;
+package Data::Type::Object::std_uri;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -722,10 +707,10 @@ package Data::Type::Object::uri;
 	{
 		my $this = shift;
 
-		        Data::Type::ok( 1, Data::Type::Facet::match( 'uri', $this->[0] || 'http'  ) );
+		        Data::Type::ok( 1, Data::Type::Facet::match( 'std/uri', $this->[0] || 'http'  ) );
 	}
 
-package Data::Type::Object::ip;
+package Data::Type::Object::std_ip;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -758,11 +743,11 @@ package Data::Type::Object::ip;
 			}
 			else
 			{
-				Data::Type::ok( 1, Data::Type::Facet::match( 'net', $format ) );
+				Data::Type::ok( 1, Data::Type::Facet::match( 'std/net', $format ) );
 			}
 	}
 
-package Data::Type::Object::domain;
+package Data::Type::Object::std_domain;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -772,18 +757,18 @@ package Data::Type::Object::domain;
 
 	sub info { qq{a network domain name} }
 
+	sub _filters : method { return ( [ 'lc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
 			Data::Type::ok( 1, Data::Type::Facet::defined() );
 
-			Data::Type->filter( [ 'lc' ] );
-
-			Data::Type::ok( 1, Data::Type::Facet::match( 'domain' ) );
+			Data::Type::ok( 1, Data::Type::Facet::match( 'std/domain' ) );
 	}
 
-package Data::Type::Object::port;
+package Data::Type::Object::std_port;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -797,12 +782,12 @@ package Data::Type::Object::port;
 	{
 		my $this = shift;
 
-			Data::Type::Object::int->test( $Data::Type::value );
+		Data::Type::Object::std_int->test( $Data::Type::value );
 
     		throw Data::Type::Exception->new( text => 'no port number' ) unless $Data::Type::value < 650;
 	}
 
-package Data::Type::Object::path;
+package Data::Type::Object::std_path;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -812,7 +797,7 @@ package Data::Type::Object::path;
 
 	sub desc : method { 'path' }
 
-	sub info { qq{a path string (not really functional)} }
+	sub info { qq{a path string} }
 
 	sub _test
 	{
@@ -821,7 +806,7 @@ package Data::Type::Object::path;
 			#Data::Type::ok( 0, Data::Type::Facet::match( qr/.+/ ) );
 	}
 
-package Data::Type::Object::regionname;
+package Data::Type::Object::std_regionname;
 
      our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -835,13 +820,13 @@ package Data::Type::Object::regionname;
 
 	sub info : method { qq{region name} }
 
+	sub _filters : method { return ( [ 'uc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
 
 		$this->[0] or Carp::croak( 'unallowed country name' );
-		
-		Data::Type->filter( [ 'uc' ] );
 		
 		my $loc = Locale::SubCountry->new( $this->[0] );
 		
@@ -859,7 +844,7 @@ package Data::Type::Object::regionname;
 		throw Data::Type::Exception->new( text => 'bad regionname' ) unless exists $states{ $Data::Type::value };
 	}
 
-package Data::Type::Object::regioncode;
+package Data::Type::Object::std_regioncode;
 
   our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -871,31 +856,31 @@ package Data::Type::Object::regioncode;
 
   sub info : method { qq{region code} }
 
-	sub _test
-	{
-		my $this = shift;
+  sub _filters : method { return ( [ 'uc' ] ) }
 
-         $this->[0] or Carp::croak( 'unallowed region code' );
+  sub _test
+  {
+      my $this = shift;
+      
+      $this->[0] or Carp::croak( 'unallowed region code' );
+      
+      my %states;
+      
+      eval
+      {
+	  my $loc = Locale::SubCountry->new( $this->[0] );
+	  
+	  %states =  $loc->code_full_name_hash;
+      };
+      
+      throw Data::Type::Exception->new( text => 'Local::SubCountry error: '.$@ ) if $@;
+      
+      #print $states{'SA'} eq 'South Australia' ? "ok 9\n" : "not ok 9\n";
 
-        Data::Type->filter( [ 'uc' ] );
+      throw Data::Type::Exception->new( text => 'bad regioncode' ) unless exists $states{ $Data::Type::value };
+  }
 
-         my %states;
-
-         eval
-         {
-            my $loc = Locale::SubCountry->new( $this->[0] );
-
-            %states =  $loc->code_full_name_hash;
-         };
-
-         throw Data::Type::Exception->new( text => 'Local::SubCountry error: '.$@ ) if $@;
-
-         #print $states{'SA'} eq 'South Australia' ? "ok 9\n" : "not ok 9\n";
-
-         throw Data::Type::Exception->new( text => 'bad regioncode' ) unless exists $states{ $Data::Type::value };
-	}
-
-package Data::Type::Object::countrycode;
+package Data::Type::Object::std_countrycode;
 
    our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -909,12 +894,11 @@ package Data::Type::Object::countrycode;
 
 	sub info : method { q{country code} }
 
+	sub _filters : method { return ( [ 'uc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-		Data::Type->filter( [ 'uc' ] );
-
 
          my %countries;
 
@@ -932,7 +916,7 @@ package Data::Type::Object::countrycode;
          throw Data::Type::Exception->new( text => 'bad countrycode' ) unless exists $countries{ $Data::Type::value };
 	}
 
-package Data::Type::Object::countryname;
+package Data::Type::Object::std_countryname;
 
    our @ISA = qw(Data::Type::Collection::Std::Interface::Locale);
 
@@ -946,11 +930,11 @@ package Data::Type::Object::countryname;
 
 	sub info : method { qq{country name} }
 
+	sub _filters : method { return ( [ 'uc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-		Data::Type->filter( [ 'uc' ] );
 
          my %countries;
 
@@ -966,7 +950,7 @@ package Data::Type::Object::countryname;
          throw Data::Type::Exception->new( text => 'this is not a country name refering to ISO' ) unless exists $countries{ $Data::Type::value };
 	}
 
-package Data::Type::Object::zip;
+package Data::Type::Object::std_zip;
 
    our @ISA = qw(Data::Type::Collection::Std::Interface::Business);
 
@@ -1002,10 +986,10 @@ package Data::Type::Object::zip;
  
      my $ccode = $countries->{ $this->[0] || 'US' } || $this->[0];
  
-     Data::Type::ok( 1, Data::Type::Facet::match( 'zip', $ccode ) );
+     Data::Type::ok( 1, Data::Type::Facet::match( 'std/zip', $ccode ) );
     }   
 
-package Data::Type::Object::date;
+package Data::Type::Object::std_date;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Temporal);
 
@@ -1019,13 +1003,13 @@ package Data::Type::Object::date;
 
 	sub info : method { 'date (see Date::Parse)' }
 
-	sub usage  : method { q{DATE employs Date::Parse itss str2time function. (filters: chomp)} }
+	sub usage  : method { q{DATE employs Date::Parse str2time function.} }
+
+	sub _filters : method { return ( [ 'chomp' ] ) }
 
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'chomp' ] );
 
 			#Date::Parse->language('German');
 
@@ -1040,7 +1024,7 @@ package Data::Type::Object::date;
 			) unless Date::Parse::str2time( $Data::Type::value );
 	}
 
-package Data::Type::Object::pod;
+package Data::Type::Object::std_pod;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -1060,11 +1044,11 @@ package Data::Type::Object::pod;
 
 	sub usage  : method { q{POD() requires a filename value} }
 
+	sub _filters : method { return ( [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'chomp' ] );
 
 			throw Data::Type::Exception(
 
@@ -1087,7 +1071,7 @@ package Data::Type::Object::pod;
 			) unless Pod::Find::contains_pod( $Data::Type::value, 0 );
 	}
 
-package Data::Type::Object::shebang;
+package Data::Type::Object::std_shebang;
 	
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 	
@@ -1099,12 +1083,12 @@ package Data::Type::Object::shebang;
 	  
 	  sub usage  : method { '( SIGNATURE [, SIGNATURE] ) - SIGNATURE is a text fragment (default: perl)' }
 	  
+	  sub _filters : method { return ( [ 'chomp' ] ) }
+
 	  sub _test
 	  {
 		my $this = shift;
 
-		Data::Type->filter( [ 'chomp' ] );
-		
 		throw Data::Type::Exception(
 					    
 					    text => 'supplied filename does not exist',
@@ -1145,7 +1129,7 @@ package Data::Type::Object::shebang;
 					    ) unless $first_line =~ /#!$sign_allowed/;
 	    }
 
-package Data::Type::Object::x500;
+package Data::Type::Object::std_x500;
 
 	our @ISA = qw(Data::Type::Collection::Std::Interface::Logic);
 
@@ -1161,11 +1145,11 @@ package Data::Type::Object::x500;
 
 	sub usage  : method { q{()} }
 
+	sub _filters : method { return ( [ 'chomp' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'chomp' ] );
 
 			throw Data::Type::Exception(
 
@@ -1178,7 +1162,7 @@ package Data::Type::Object::x500;
 			) unless X500::DN->ParseRFC2253( $Data::Type::value );
 	}
 
-package Data::Type::Object::xml;
+package Data::Type::Object::std_xml;
 
    our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -1206,7 +1190,7 @@ package Data::Type::Object::xml;
          throw Data::Type::Exception->new( text => $@ ) if $@;
 	}
 
-package Data::Type::Object::html;
+package Data::Type::Object::std_html;
 
   our @ISA = qw(Data::Type::Collection::Std::Interface::String);
 
@@ -1265,8 +1249,6 @@ END_HERE
 
 1;
 
-=pod
-
 =head1 NAME
 
 Data::Type::Collection::Std - the standard set of data types
@@ -1306,500 +1288,330 @@ Data::Type::Collection::Std - the standard set of data types
  valid '80', STD::PORT;
  valid 'www.cpan.org', STD::DOMAIN;
 
- valid '<pre>hello</pre><br>', HTML;
- valid '<field>hello</field>', XML;
+ valid '<pre>hello</pre><br>', STD::HTML;
+ valid '<field>hello</field>', STD::XML;
 
 =head1 TYPES
 
 
-=head2 STD::BINARY
+=head2 STD::BINARY (since 0.01.25)
 
 binary code
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item USAGE
+=head3 Usage
 
 Set of ( [0|1] )
 
-=back
-
-=head2 STD::BOOL
+=head2 STD::BOOL (since 0.01.25)
 
 boolean value
 
-=head2 STD::CINS
+=head2 STD::CINS (since 0.01.03)
 
 CINS
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 i.e. 035231AH2
 
-=item DEPENDS
+=head3 Depends
 
 L<Business::CINS>
 
-=back
-
-=head2 STD::COUNTRYCODE
+=head2 STD::COUNTRYCODE (since 0.01.05)
 
 country code
 
-=over 2
-
-=item VERSION
-
-0.01.05
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::SubCountry>
 
-=back
-
-=head2 STD::COUNTRYNAME
+=head2 STD::COUNTRYNAME (since 0.01.05)
 
 country name
 
-=over 2
-
-=item VERSION
-
-0.01.05
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::SubCountry>
 
-=back
-
-=head2 STD::CREDITCARD
+=head2 STD::CREDITCARD (since 0.01.25)
 
 creditcard
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \D
 
-0.01.25
+=head3 Usage
 
-=item USAGE
+CREDITCARD( Set of [MASTERCARD|AMEX|DISCOVER|BANKCARD|BLACHE|VISA|JCB|DINERS], .. )
 
-CREDITCARD( Set of [AMEX|BLACHE|JCB|MASTERCARD|DISCOVER|BANKCARD|VISA|DINERS], .. )
-
-=item DEPENDS
+=head3 Depends
 
 L<Business::CreditCard>
 
-=back
-
-=head2 STD::DATE
+=head2 STD::DATE (since 0.01.01)
 
 date
 
-=over 2
+=head3 Usage
 
-=item VERSION
+DATE employs Date::Parse str2time function.
 
-0.01.01
-
-=item USAGE
-
-DATE employs Date::Parse itss str2time function. (filters: chomp)
-
-=item DEPENDS
+=head3 Depends
 
 L<Date::Parse>
 
-=back
-
-=head2 STD::DEFINED
+=head2 STD::DEFINED (since 0.01.04)
 
 defined value
 
-=head2 STD::DOMAIN
+=head2 STD::DOMAIN (since 0.01.04)
 
 domain name
 
-=head2 STD::EMAIL
+=head2 STD::EMAIL (since 0.01.25)
 
 email address
 
-=over 2
+=head3 Usage
 
-=item VERSION
+[MXCHECK as STD::BOOL]
+  MXCHECK results actually tests the mx host via internet (see Email::Valid)
 
-0.01.25
 
-=item USAGE
-
-EMAIL( [MXCHECK:BOOL] ); MXCHECK results in net use (see Email::Valid)
-
-=item DEPENDS
+=head3 Depends
 
 L<Email::Valid>
 
-=back
-
-=head2 STD::GENDER
+=head2 STD::GENDER (since 0.01.25)
 
 human gender
 
-=head2 STD::GENDER::DE
+=head2 STD::GENDER::DE (since 0.01.12)
 
 human gender
 
-=head2 STD::HEX
+=head2 STD::HEX (since 0.01.25)
 
 String
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.25
-
-=item USAGE
+=head3 Usage
 
 Set of ( ([0-9a-fA-F]) )
 
-=back
-
-=head2 STD::HTML
+=head2 STD::HTML (since 0.01.37)
 
 html markup
 
-=over 2
-
-=item VERSION
-
-0.01.37
-
-=item USAGE
+=head3 Usage
 
 ( 'structure' (default) | 'fluff' | 'helper' ) They are derived from the HTML::Lint->new() parameters (see HTML::Lint::Error)
 
 
-=item DEPENDS
+=head3 Depends
 
 L<HTML::Lint>
 
-=back
-
-=head2 STD::INT
+=head2 STD::INT (since 0.01.27)
 
 integer
 
-=over 2
-
-=item VERSION
-
-0.01.27
-
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>
 
-=back
-
-=head2 STD::IP
+=head2 STD::IP (since 0.01.04)
 
 IP (v4 or v6) or MAC network address
 
-=over 2
-
-=item VERSION
-
-0.01.04
-
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>, L<Net::IPv6Addr>
 
-=back
-
-=head2 STD::ISSN
+=head2 STD::ISSN (since 0.01.03)
 
 ISSN
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 example: 14565935
 
-=item DEPENDS
+=head3 Depends
 
 L<Business::ISSN>
 
-=back
-
-=head2 STD::LANGCODE
+=head2 STD::LANGCODE (since 0.01.03)
 
 language code
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::Language>
 
-=back
-
-=head2 STD::LANGNAME
+=head2 STD::LANGNAME (since 0.01.03)
 
 natural language
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::Language>
 
-=back
-
-=head2 STD::NUM
+=head2 STD::NUM (since 0.01.25)
 
 number
 
-=head2 STD::PATH
+=head2 STD::PATH (since 0.01.06)
 
 path
 
-=head2 STD::POD
+=head2 STD::POD (since 0.01.36)
 
 file containing Pod instructions
 
-=over 2
-
-=item VERSION
-
-0.01.36
-
-=item USAGE
+=head3 Usage
 
 POD() requires a filename value
 
-=item DEPENDS
+=head3 Depends
 
 L<Pod::Find>
 
-=back
-
-=head2 STD::PORT
+=head2 STD::PORT (since 0.01.04)
 
 tcp port number
 
-=head2 STD::QUOTED
+=head2 STD::QUOTED (since 0.01.25)
 
 quoted string
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>
 
-=back
-
-=head2 STD::REAL
+=head2 STD::REAL (since 0.01.25)
 
 real
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>
 
-=back
-
-=head2 STD::REF
+=head2 STD::REF (since 0.01.25)
 
 perl reference
 
-=head2 STD::REGIONCODE
+=head2 STD::REGIONCODE (since 0.01.05)
 
 country region code
 
-=over 2
-
-=item VERSION
-
-0.01.05
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::SubCountry>
 
-=back
-
-=head2 STD::REGIONNAME
+=head2 STD::REGIONNAME (since 0.01.05)
 
 country region
 
-=over 2
-
-=item VERSION
-
-0.01.05
-
-=item DEPENDS
+=head3 Depends
 
 L<Locale::SubCountry>
 
-=back
-
-=head2 STD::SHEBANG
+=head2 STD::SHEBANG (since 0.01.36)
 
 file containing a she-bang (#!)
 
-=over 2
-
-=item VERSION
-
-0.01.36
-
-=item USAGE
+=head3 Usage
 
 ( SIGNATURE [, SIGNATURE] ) - SIGNATURE is a text fragment (default: perl)
 
-=back
-
-=head2 STD::UPC
+=head2 STD::UPC (since 0.01.03)
 
 UPC
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 i.e. 012345678905
 
-=item DEPENDS
+=head3 Depends
 
 L<Business::UPC>
 
-=back
-
-=head2 STD::URI
+=head2 STD::URI (since 0.01.25)
 
 uri
 
-=over 2
-
-=item VERSION
-
-0.01.25
-
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>
 
-=back
-
-=head2 STD::WORD
+=head2 STD::WORD (since 0.01.25)
 
 word (without whitespaces)
 
-=head2 STD::X500::DN
+=head2 STD::X500::DN (since 0.01.37)
 
 X.500 DN (Distinguished Name)
 
-=over 2
-
-=item VERSION
-
-0.01.37
-
-=item USAGE
+=head3 Usage
 
 ()
 
-=item DEPENDS
+=head3 Depends
 
 L<X500::DN>
 
-=back
-
-=head2 STD::XML
+=head2 STD::XML (since 0.01.06)
 
 xml markup
 
-=over 2
-
-=item VERSION
-
-0.01.06
-
-=item DEPENDS
+=head3 Depends
 
 L<XML::Parser>
 
-=back
-
-=head2 STD::YESNO
+=head2 STD::YESNO (since 0.01.25)
 
 primitiv answer
 
-=head2 STD::YESNO::DE
+=head2 STD::YESNO::DE (since 0.01.14)
 
 primitiv answer
 
-=head2 STD::ZIP
+=head2 STD::ZIP (since 0.01.14)
 
 zip code
 
-=over 2
-
-=item VERSION
-
-0.01.14
-
-=item USAGE
+=head3 Usage
 
 ZIP( "DE" | "AU" | "DK" | "NL" | "US" | "BE" | "FR" )
 
-=item DEPENDS
+=head3 Depends
 
 L<Regexp::Common>
-
-=back
 
 
 
@@ -1808,11 +1620,9 @@ L<Regexp::Common>
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -129,6 +128,21 @@ print Data::Dumper->Dump( [ Data::Type::Query->depends() ] );
 
 print join( "\n", STD::ZIP()->info, STD::ZIP()->usage, STD::ZIP()->doc ), "\n";
 
+# Test whether pkgname is sufficient for summary()
+	Data::Type::println "Now summary via pkg for Data::Type::Object::bio_codon";
+
+        my $type = 'Data::Type::Object::bio_codon';
+
+	Data::Type::println "\n" x 2, "Describing ", $type->info;
+
+	foreach my $entry ( Data::Type::summary( '', $type ) )
+        {
+	    Data::Type::printfln "\texpecting it %s %s ", $entry->expected ? 'is' : 'is NOT', Data::Type::strlimit( $entry->object->info() );
+	  }
+
+
+	Data::Type::println "TESTING TYPS";
+
 #$Data::Type::debug = 1;
 
 dvalid "bbbbbbb", BIO::DNA or warn "no dna";
@@ -140,6 +154,8 @@ dvalid "ACTTTTT", BIO::DNA and warn "dna detected";
 $_ = "XXXKKKKLLLL";
 
 warn "ALIENS DETECETD" unless is BIO::DNA;
+
+is BIO::DNA or warn "not DNA";
 
 	# Thanks to sudoer(at)users.sf.net for this test
 

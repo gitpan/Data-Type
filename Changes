@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::Type.
+
+0.01  Sun Apr  4 08:01:20 2004
+	- original version; created by h2xs 1.23 with options
+		-n Data::Type -X
+

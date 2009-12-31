@@ -1,8 +1,7 @@
 
-# (c) 2002 by Murat Uenalan. All rights reserved. Note: This program is
+# (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
 # free software; you can redistribute it and/or modify it under the same
 # terms as perl itself
-
 package Data::Type::Collection::Bio::Interface;
 
   our @ISA = qw(Data::Type::Object::Interface);
@@ -11,37 +10,14 @@ package Data::Type::Collection::Bio::Interface;
 
   sub prefix : method { 'Bio::' }
 
-package Data::Type::Regex;
-
-  register 'dna', exact( qr/[ATGC]+/ ), 'arbitrary set of A, T, G or C';
-
-  register 'rna', exact( qr/[AUGC]+/ ), 'arbitrary set of A, U, G or C';
-
-register(
-	 'triplet', 
-	 
-	 sub 
-	 {
-	     my $this = shift;
-	     
-	     my $type = lc( shift || 'dna' );
-
-	     Carp::croak __PACKAGE__." required parameter missing dna (default) or rna" unless defined $type;
-
-	     Carp::croak sprintf "%s triplet usage failure (dna or rna) only and not $_[1]", __PACKAGE__, $type unless $type =~ /^[rd]na$/;
-	       
-             return exact( $type eq 'dna' ? qr/[ATGC]{3,3}/ : qr/[AUGC]{3,3}/ ); 
-	 }, 
-
-         sub { sprintf "a triplet string of %s", $_[1] || 'dna (default) or rna' }
-);
+  sub pkg_prefix : method { 'bio_' }
 
 	# BIO stuff
 	
 	# Resources: http://users.rcn.com/jkimball.ma.ultranet/BiologyPages/C/Codons.html
 	# CPAN: Bio::Tools::CodonTable
 	
-package Data::Type::Object::dna;
+package Data::Type::Object::bio_dna;
 
   our @ISA = qw(Data::Type::Collection::Bio::Interface Data::Type::Collection::Std::Interface::Logic);
 
@@ -53,20 +29,20 @@ package Data::Type::Object::dna;
 
   sub info : method { q{dna sequence} }
 
-sub usage : method { 'sequence of [ATGC]' }
-	
-	sub _test : method
-	{
-		my $this = shift;
+  sub usage : method { 'sequence of [ATGC]' }
 
-		#warn "dt test \$Data::Type::value '$Data::Type::value'";
-		
-		Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
-		
-		Data::Type::ok( 1, Data::Type::Facet::match( 'dna' ) );
-	}
+  sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
 
-package Data::Type::Object::rna;
+  sub _test : method
+  {
+      my $this = shift;
+      
+      #warn "dt test \$Data::Type::value '$Data::Type::value'";
+            
+      Data::Type::ok( 1, Data::Type::Facet::match( 'bio/dna' ) );
+  }
+
+package Data::Type::Object::bio_rna;
 
 	our @ISA = qw(Data::Type::Collection::Bio::Interface Data::Type::Collection::Std::Interface::Logic);
 
@@ -79,17 +55,17 @@ package Data::Type::Object::rna;
 	sub info { qq{rna sequence} }
 
 	sub usage { 'sequence of [ATUC]' }
+
+	sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ] ) }
 	
 	sub _test
 	{
 		my $this = shift;
 
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp' ] );
-
-		        Data::Type::ok( 1, Data::Type::Facet::match( 'rna' ) );
+		        Data::Type::ok( 1, Data::Type::Facet::match( 'bio/rna' ) );
 	}
 
-package Data::Type::Object::codon;
+package Data::Type::Object::bio_codon;
 
 	our @ISA = qw(Data::Type::Collection::Bio::Interface Data::Type::Collection::Std::Interface::Logic);
 
@@ -103,26 +79,25 @@ package Data::Type::Object::codon;
 
 	sub usage : method { 'triplet of DNA or RNA' }
 	
+
+        sub _filters : method { return ( [ 'strip', '\s' ], [ 'chomp' ], [ 'uc' ] ) }
+
 	sub _test
 	{
 		my $this = shift;
-
-			Data::Type->filter( [ 'strip', '\s' ], [ 'chomp', 'uc' ] );
 			
 			my $kind = lc( $this->[0] || 'DNA' );
 
 			Carp::croak( sprintf "'%s' expects 'DNA' or 'RNA' as an argument and not '%s'",$this->export,$kind ) unless $kind eq 'dna' || $kind eq 'rna';
 
-		        Data::Type::ok( 1, Data::Type::Facet::match( 'triplet', $kind ) );
+		        Data::Type::ok( 1, Data::Type::Facet::match( 'bio/triplet', $kind ) );
 	}
 
 1;
 
-=pod
-
 =head1 NAME
 
-Data::Type::Collection::Bio - types from databases
+Data::Type::Collection::Bio - datatypes for biology
 
 =head1 SYNOPSIS
 
@@ -157,60 +132,48 @@ Data::Type::Collection::Bio - types from databases
 
 =head1 DESCRIPTION
 
-Everything that is related to biochemical matters.
+Everything that is related to biological matters.
 
-[Note] Also a fictive C<BIO::ATOM> which would count to the chemical matters would go into that collection.
+[Note] Also have a glimpse on 'Chem' collection.
 
 =head1 TYPES
 
 
-=head2 BIO::CODON
+=head2 BIO::CODON (since 0.01.03)
 
 DNA/RNA triplet
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 triplet of DNA or RNA
 
-=back
-
-=head2 BIO::DNA
+=head2 BIO::DNA (since 0.01.03)
 
 dna fragment
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 sequence of [ATGC]
 
-=back
-
-=head2 BIO::RNA
+=head2 BIO::RNA (since 0.01.03)
 
 RNA fragment
 
-=over 2
+=head3 Filters
 
-=item VERSION
+L<strip|Data::Type::Filter/strip> \s
 
-0.01.03
-
-=item USAGE
+=head3 Usage
 
 sequence of [ATUC]
-
-=back
 
 
 
@@ -219,11 +182,9 @@ sequence of [ATUC]
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut

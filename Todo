@@ -122,7 +122,12 @@ done
    was silly ';' missing after catch block ! This is a FOP (frequently occuring problem) with the
    Error module syntax sugar. 
    
-   FOP should be included into the FAQ.
+   todo
+   {
+	FOP should be included into the FAQ.
+   }
+   done
+
 }
 
 todo
@@ -191,21 +196,9 @@ todo
 	_translate should really translate "back and forth" type pkgname <> imported name (respecting
 	export).
 }
-
-todo
+comment
 {
-	write GetOpt extension which adds Data::Type support to parameters.
-}
-
-todo
-{
-        Add describtive aliases to Regex used from Regexp::Common or out of the internal Regex:: .
-        - 'email address matching RFCxxx' instead of /*****/
-        - This will remove this raw regex's occuring in testplan() decribtions or error msgs.
-}
-done
-{
-	Now you can define an alias for the pure regex, which is used for error texts.
+	_translate renamed. Still uptodate?
 }
 
 todo
@@ -227,20 +220,6 @@ comment
 	Also Path::Class should be helpfull then.
 }
 
-todo( DOCU )
-{
-	Write Tutorial/FAQ
-	  * 'How to add new types' or 'How to add my custom types'
-	  * How could i use D::T to assure valid function parameters
-	    - with Params::Validate
-
-		  validate( @_, { foo => { type => REF( 'ARRAY' ) } );
-}
-partial
-{
-	see Howto.pod
-}
-
 todo
 {
 	catalog/toc with grouping for localization
@@ -248,28 +227,7 @@ todo
 
 todo
 {
-	Write a Class::Maker extension for verifying if the attributes match its types (This can be done
-	with a flexible (reflex-inspecting) bouncer).
-}
-comment
-{
-	see Data::Type::Guard.
-}
-
-todo
-{
-	- Implement decision table for bouncer-like (bouncer is far too simple for the new possibilities)
-	scenarios. This can be done via Decision::Table after Data::Type::Guard gave us his opinion.
-}
-
-todo
-{
 	overify() / Data::Type::Guard should report which member failed
-}
-
-todo
-{
-	Filter::'s should also have delayed calls via AUTOLOAD like Type::
 }
 
 todo
@@ -285,56 +243,6 @@ comment
 partial
 {
 	<type>::DE is implemented
-}
-
-todo
-{
-	Pay a round of usefull ->usage information to the types.
-}
-done
-{
-	a never ending story
-}
-
-todo
-{
-	Prepare api for casting of types.
-	Suggestion: my $a_castedto_b = TYPE_A->cast( TYPE_B );
-}
-step
-{
-	added empty Type::UNIVERSAL::cast()
-}
-
-todo
-{
-	take y:/perl/test/Maketext/Locale/maketext.pl as a template
-	for a clean Locale::Maketext translation of Data::Type.
-}
-done
-
-todo
-{
-	add a verify version which takes $_ per default.
-
-	This would allow constructs lik
-
-	 $_ = 'ATCGFCDSD';
-
-	 warn "this must be an alien species" unless dverify BIO::DNA;
-
-	or 
-	
-	 try
-	 {
-	 	$animal->kill unless verify BIO::DNA;
-	 }
-	 catch
-}
-done
-{
-	dvalid (alias is) take $_ when only single argument was
-	given.
 }
 
 todo
@@ -414,6 +322,14 @@ todo
 {
 	add EMAIL( alias_for_at => qr/@|\sat\s|\(at\)|<at>/ ) option, so 'obfuscated' emails are detectable.
 }
+comment
+{
+	Not sure if this isnt just good for spam-dogs.
+}
+comment
+{
+	see Email::Valid::Loose etc.
+}
 
 todo
 {
@@ -423,7 +339,7 @@ todo
 
         to
 
-           typ EMAIL, \( my $e, $e2, $ex );
+           typ VARCHAR(80), \( my $e, $e2, $ex );
 
         for mimicing a "builtin" type support via the tie interface.
 }
@@ -443,6 +359,10 @@ todo
 comment
 {
 	There were this cut+autoload+eval modules on CPAN ?! Or use eval "use Module" unless $INC{Module};
+}
+done
+{
+	implemented simple lazy loading of modules
 }
 
 todo
@@ -545,6 +465,10 @@ Usage:
 
 	SEC::PASSWD( strength => 'strong|medium|weak' );
 }
+comment
+{
+	use from CPAN Data::Password::BasicCheck. It looks good.
+}
 
 todo
 {
@@ -559,4 +483,228 @@ todo
 todo
 {
 	fill all the desc(), info(), usage() etc with comprehensive docu. Then CPAN release.
+}
+
+todo
+{
+	CHEM::ATOM
+	
+	See CPAN Chemistry::Atom:
+
+@ELEMENTS = qw(
+    n
+    H                                                                   He
+    Li  Be                                          B   C   N   O   F   Ne
+    Na  Mg                                          Al  Si  P   S   Cl  Ar
+    K   Ca  Sc  Ti  V   Cr  Mn  Fe  Co  Ni  Cu  Zn  Ga  Ge  As  Se  Br  Kr
+    Rb  Sr  Y   Zr  Nb  Mo  Tc  Ru  Rh  Pd  Ag  Cd  In  Sn  Sb  Te  I   Xe
+);
+
+}
+done
+
+todo
+{
+	cite http://www.perlmonks.org/index.pl?node_id=295306
+}
+
+todo
+{
+	write GetOpt extension which adds Data::Type support to parameters.
+}
+
+todo
+{
+	Create Regexp::Box
+}
+done
+
+todo
+{
+	Put in some mechanism to prefix all datatype export names. So one could
+	define a generale namespace like
+
+	use Data::Type from => 't::';
+
+		die unless is t::STD::EMAIL;
+
+	[Note] For people scarring the the namespace pollution could conflict somewhere.
+
+		die unless is __STD::EMAIL;
+
+	[Note] Or maybe just a prefixed string like '__' or '~' ?
+}
+done
+{
+	See EXPORT / OPTIONS / MASTER PREFIX.
+}
+
+todo
+{
+	Integrate Email::Valid::Loose into STD::EMAIL.
+
+	  die unless is STD::EMAIL( loose => 1 );
+}
+
+todo
+{
+	->summary with emptry parameters dies without informative message. There must be a "default summary" which can be used within the documentation. 
+
+Check the capibility of ->choice and ->default for that.
+}
+done
+{
+	Not viable because the test procedure is dependant on parameters. Not alle procedures have a default parameter.
+}
+
+todo
+{
+
+	sub _test
+	{
+		my $this = shift;
+
+		Data::Type->filter( [ 'uc' ] );
+
+
+       sucks!
+
+       ----
+
+       Better add method
+
+	 sub filters ( return ( [ 'lc' ], [ 'strip', ' ' ] ) }
+
+        and then call via
+
+         Data::Type::OBject::Interfacet::test
+
+        to filter $Data::Type::val.
+
+       ---
+ 
+       Helps reflecting which filters are applied (automatically added to the docu).       	
+}
+done
+
+todo
+{
+	add <result> method which contains the 'parsing/extracting' results which
+        are for *free* because they are byproduct of the regex matching or whatever.
+
+	See L<Regexp::Common>.
+}
+comment
+{
+	Needs some clarification/definition in the ::RFC.
+}
+
+todo
+{
+  Documentaton:
+
+	* clean $scalar = bla() headers and change to 
+
+         =head function( )
+
+           $b = function();
+           @a = function(1);
+
+        style.
+
+  Complete
+
+	* Type/Docs/RFC.pod
+        - Type/Facet.pm
+        - Type/Field.pm
+        - Type/Filter.pm
+}
+partial
+{
+	still
+
+        - Type/Facet.pm
+        - Type/Field.pm
+        - Type/Filter.pm
+}
+partial
+{
+	still
+
+        - Type/Field.pm
+}
+
+todo
+{
+  shell> perldoc STD::VARCHAR
+
+        would be great but is very brute to namespaces etc.
+
+  shell> Data::Type::STD::VARCHAR
+
+  is better?
+
+  shell> perldoc Data::Type::Collection::Std;
+
+  is ok though?
+}
+
+todo(Data::Type::Docs::RFC)
+{
+	Methods all _private or not? _test is but others?
+}
+
+todo
+{
+  write test for L<Data::Type/summary()>.
+}
+
+todo
+{
+	allow aliases DB_VARCHAR instead of DB::VARCHAR.
+}
+partial
+{
+	But exports doesnt work now. 
+
+          sub DB::VARCHAR ...
+
+	is now 
+
+	  sub DB_VARCHAR
+   
+        [Note] in the first case we have 'export' for free. In the second case it now gets eval'ed within Data::Type:: and
+        DB_VARCHAR is accessible via Data::Type::DB_VARCHAR.
+
+	HMmmmmm..... ? Is this bad ?
+}
+partial
+{
+	No full blown control via the L<Data::Type/EXPORT/MASTER PREFIX> option.
+}
+
+todo
+{
+	Somewhat i would love to write
+
+	  $_ = cgi->param->{input};
+
+	  warn unless is( 'std.varchar.de', option1 => 1, option2 => 2, ... );
+
+	or 
+
+	  warn unless is( 'bio.dna', option1 => 1, option2 => 2, ... );
+
+	or 
+
+	  try 
+	  { 
+	    valid 'ATGC', 'bio.dna', option1 => 1, option2 => 2, ...; 
+	  }
+	  catch Error with 
+	  { 
+
+	  };
+
+        My gut says is less error prone and easier to read. Syntactic sugar is sometimes too annoying.
 }

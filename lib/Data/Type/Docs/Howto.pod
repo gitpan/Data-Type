@@ -1,7 +1,3 @@
-<TMPL_VAR name="codecopyright">
-
-=pod
-
 =head1 NAME
 
 Data::Type::Docs::Howto - Point to point recipes how to get things done
@@ -10,10 +6,7 @@ Data::Type::Docs::Howto - Point to point recipes how to get things done
 
 Here some words on major fields where perl and B<Data::Type> may be used. Generally you may use L<Data::Type::Guard> (drawback: currently inferior problem reports) for a group of types, or use C<valid()> one by one. Prompting the user when he made mistakes is best done with the C<summary()> function (supports localized texts) or by simply translating the thrown exceptions to B<non-programmer-style> instructions.
 
-=over 4
-
-=item *
-CGI
+=head2 CGI
 
 Web formfields ares definitivly the painmaker number one. Testing whether the user entered what you want is no more a difficult task. B<Data::Type> also helps you to provide this nice B<red marks> near incorrect input fields, to point the user what was wrong. A fictive form
 
@@ -48,6 +41,8 @@ and alternativ for F</cgi-bin/applyform.cgi>:
 
     my %problems;
 
+    use Data::Iter 'iter'; # exports 'iter'
+
     foreach my $i ( iter { email => STD::EMAIL( 1 ), firstname => STD::WORD  } )
     {
       try
@@ -64,12 +59,11 @@ and alternativ for F</cgi-bin/applyform.cgi>:
 
     generate_cgi__form( annotate => \%problems );
 
-[Note] B<iter()> is a function from the L<Iter> CPAN package (by CPANID B<muenelan> and not the one from L<PerlQT>). It isnt necassary, but instructive.
+[Note] B<iter()> is a function from the L<Data::Iter> (CPAN).
 
 [Info] Visit the F<contrib/cgi_application_datatype_verifier.pl> under the distributions root directory. It provides a machine-independant approach to type verification. Via this cgi-script you install Data::Type on one machine and all others with network access can harness it (even from another language then perl).
 
-=item *
-DBI
+=head2 DBI
 
 Imagine you want to test whether all email addresses in an existing database are active/valid. Since no known database vendor has a custom "email" datatype included AFAIK, B<Data::Type> shines here:
 
@@ -95,8 +89,7 @@ Imagine you want to test whether all email addresses in an existing database are
 
 [Note] This would have been easier to use an L<Data::Type::Guard> object, but its verbose.
 
-=item *
-Class properties
+=head2 Class properties
 
   my $g = Data::Type::Guard->new( 
 
@@ -118,8 +111,62 @@ Class properties
 
   printf "%s is ok", $h->firstname if $g->inspect( $h );
 
-=item *
-Perl data
+If one is really adventerous enough to use L<Class::Maker> (i use it!) one could use following extension to its 'class' function:
+
+ class 'Human',
+ {
+   public =>
+   {
+      string => [qw(email firstname lastname sex)],
+
+      num => [qw(age countrycode)],
+
+      hash => [qw(contacts)],
+   },
+   types =>
+   {
+      email => STD::EMAIL, 
+
+      firstname => STD::WORD,
+
+      lastname  => STD::WORD,
+
+      sex => STD::GENDER,
+
+      countrycode => STD::NUM,
+
+      age => STD::NUM,
+
+      contacts => sub { my %args = @_; exists $args{lucy} },		
+   }
+ };
+
+ ... create $g and $h as above ...
+
+ $g->inspect( $h );
+
+[Note] L<Class::Maker> has soon more documentation on it.
+
+=head2 Getopt
+
+  use Getopt::Long;
+
+    my %options = ();
+
+    my @config = qw/help|? man recipient=s firstname=s count=s/;
+
+    my $ctypes = { recipient => STD::EMAIL, firstname => STD::WORD, count => STD::NUM };
+
+       GetOptions( \%options, @config ) or pod2usage(2);
+
+       my $g = Data::Type::Guard->new( tests => $ctypes );
+
+       die "invalid parameter type found\n" unless $g->inspect( \%options );
+
+B<[NOTE]> C<recipient=s> is already some loose valuetype definition. So a more integrated L<Getopt::Long> 
+could someday use Data::Type types like C<recipient=STD::EMAIL>. Anybody interested, hands up?
+
+=head2 Perl data
 
   sub my_function
   {
@@ -143,13 +190,11 @@ Perl data
 
   my_function( one => 123, two => 3247, three => 'xxxx' );
 
-=back
-
 =head1 LOCALIZATION
 
-The default initialized locale handle resides in C<$Data::Type::lh> (read only). Visit L<Locale::Maketext> manual for more material. So a simple warning would look like:
+The default initialized locale handle resides in C<$Data::Type->lh> (read only). Visit L<Locale::Maketext> manual for more material. So a simple warning would look like:
 
-  warn $lh->maketext( "Can't open file [_1]: [_2]\n", $f, $! );
+  warn $Data::Type->lh->maketext( "Can't open file [_1]: [_2]\n", $f, $! );
 
 while the lexicon in B<Data::Type::L18N::de> would look like
 
@@ -178,12 +223,10 @@ Here a complete template for your own locale:
 
 =head1 CONTACT
 
-Also L<http://sf.net/projects/datatype> is hosting a projects dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
 
 =head1 AUTHOR
 
 Murat Uenalan, <muenalan@cpan.org>
 
-
-=cut
 

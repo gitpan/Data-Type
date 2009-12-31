@@ -7,7 +7,7 @@ $Data::Type::debug = 1;
 
 # VARCHAR
 
-ok dvalid( 'one two three', $_ ) for ( Data::Type::Proxy::VARCHAR( 20 ) );
+ok dvalid( 'one two three', $_ ) for ( DB::VARCHAR( 20 ) );
 
 ok dvalid( ' ' x 20 , DB::VARCHAR( 20 ) );
 
