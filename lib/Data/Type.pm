@@ -14,7 +14,7 @@ BEGIN
 	our $rebox = Regexp::Box->new( name => 'Data::Type custom datatypes' );
 }
 
-	our $VERSION = "0.02.01";
+	our $VERSION = "0.02.02";
 
 	our $DEBUG = 0;
 

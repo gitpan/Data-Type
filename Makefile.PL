@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'		=> 'Data::Type',
-    'VERSION_FROM'	=> 'Type.pm', # finds $VERSION
+    'VERSION_FROM'	=> 'lib/Data/Type.pm', # finds $VERSION
     'PREREQ_PM'		=> 
 	{
 	  
@@ -25,7 +25,7 @@ WriteMakefile(
           
 # prerequisites by datatype
 
-'Locale::Language' => '2.21', # STD::LANGCODE, STD::LANGNAME
+'Locale::Language' => '2.0', # STD::LANGCODE, STD::LANGNAME
 'Business::CreditCard' => '0.27', # STD::CREDITCARD
 'Email::Valid' => '0.15', # STD::EMAIL
 'Business::UPC' => '0.04', # STD::UPC
@@ -44,6 +44,6 @@ WriteMakefile(
 	},
 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM => 'Type.pm', # retrieve abstract from module
+      (ABSTRACT_FROM => 'lib/Data/Type.pm', # retrieve abstract from module
        AUTHOR     => 'muenalan@cpan.org') : ()),
 );

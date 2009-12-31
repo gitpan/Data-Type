@@ -1,7 +1,7 @@
 # This Makefile is for the Data::Type extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 6.42 (Revision: 41145) from the contents of
+# 6.54 (Revision: 65400) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -10,20 +10,19 @@
 #
 #   MakeMaker Parameters:
 
-#     ABSTRACT_FROM => q[Type.pm]
+#     ABSTRACT_FROM => q[lib/Data/Type.pm]
 #     AUTHOR => q[muenalan@cpan.org]
 #     NAME => q[Data::Type]
-#     PREREQ_PM => { XML::LibXSLT=>q[1.53], Text::TabularDisplay=>q[1.18], Locale::Language=>q[2.21], Email::Valid=>q[0.15], HTML::Lint=>q[1.26], Data::Iter=>q[0], Class::Maker=>q[0.05.17], Business::ISSN=>q[0.90], Net::IPv6Addr=>q[0.2], String::ExpandEscapes=>q[0.01], Error=>q[0.15], Regexp::Common=>q[2.113], X500::DN=>q[0.28], IO::Extended=>q[0.06], Tie::ListKeyedHash=>q[0.41], Locale::SubCountry=>q[], XML::Parser=>q[2.34], Attribute::Util=>q[0.01], Pod::Find=>q[0.24], DBI=>q[1.30], Business::CreditCard=>q[0.27], Business::CINS=>q[1.13], Business::UPC=>q[0.04], Class::Multimethods=>q[1.70], Date::Parse=>q[2.27], Regexp::Box=>q[0.01], XML::Schema=>q[0.07] }
-#     VERSION_FROM => q[Type.pm]
+#     PREREQ_PM => { XML::LibXSLT=>q[1.53], Text::TabularDisplay=>q[1.18], Locale::Language=>q[2.0], Email::Valid=>q[0.15], HTML::Lint=>q[1.26], Data::Iter=>q[0], Class::Maker=>q[0.05.17], Business::ISSN=>q[0.90], Net::IPv6Addr=>q[0.2], String::ExpandEscapes=>q[0.01], Error=>q[0.15], Regexp::Common=>q[2.113], X500::DN=>q[0.28], IO::Extended=>q[0.06], Tie::ListKeyedHash=>q[0.41], Locale::SubCountry=>q[], XML::Parser=>q[2.34], Attribute::Util=>q[0.01], Pod::Find=>q[0.24], DBI=>q[1.30], Business::CreditCard=>q[0.27], Business::CINS=>q[1.13], Business::UPC=>q[0.04], Class::Multimethods=>q[1.70], Date::Parse=>q[2.27], Regexp::Box=>q[0.01], XML::Schema=>q[0.07] }
+#     VERSION_FROM => q[lib/Data/Type.pm]
 
 # --- MakeMaker post_initialize section:
 
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib/perl/5.10/Config.pm)
-
-# They may have been overridden via Makefile.PL or on the command line
+# These definitions are from config.sh (via /usr/lib/perl/5.10/Config.pm).
+# They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = cc
 CCCDLFLAGS = -fPIC
@@ -54,11 +53,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Data::Type
 NAME_SYM = Data_Type
-VERSION = 0.02.01
+VERSION = 0.02.02
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_02_01
+VERSION_SYM = 0_02_02
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.02.01
+XS_VERSION = 0.02.02
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -71,45 +70,45 @@ MAN1EXT = 1p
 MAN3EXT = 3pm
 INSTALLDIRS = site
 DESTDIR = 
-PREFIX = /usr
-PERLPREFIX = $(PREFIX)
-SITEPREFIX = $(PREFIX)/local
-VENDORPREFIX = $(PREFIX)
-INSTALLPRIVLIB = $(PERLPREFIX)/share/perl/5.10
+PREFIX = $(SITEPREFIX)
+PERLPREFIX = /usr
+SITEPREFIX = /usr/local
+VENDORPREFIX = /usr
+INSTALLPRIVLIB = /usr/share/perl/5.10
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = $(SITEPREFIX)/share/perl/5.10.0
+INSTALLSITELIB = /usr/local/share/perl/5.10.0
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = $(VENDORPREFIX)/share/perl5
+INSTALLVENDORLIB = /usr/share/perl5
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = $(PERLPREFIX)/lib/perl/5.10
+INSTALLARCHLIB = /usr/lib/perl/5.10
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = $(SITEPREFIX)/lib/perl/5.10.0
+INSTALLSITEARCH = /usr/local/lib/perl/5.10.0
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = $(VENDORPREFIX)/lib/perl5
+INSTALLVENDORARCH = /usr/lib/perl5
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = $(PERLPREFIX)/bin
+INSTALLBIN = /usr/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = $(SITEPREFIX)/bin
+INSTALLSITEBIN = /usr/local/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
-INSTALLVENDORBIN = $(VENDORPREFIX)/bin
+INSTALLVENDORBIN = /usr/bin
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = $(PERLPREFIX)/bin
+INSTALLSCRIPT = /usr/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = $(SITEPREFIX)/bin
+INSTALLSITESCRIPT = /usr/local/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
-INSTALLVENDORSCRIPT = $(VENDORPREFIX)/bin
+INSTALLVENDORSCRIPT = /usr/bin
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
-INSTALLMAN1DIR = $(PERLPREFIX)/share/man/man1
+INSTALLMAN1DIR = /usr/share/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = $(SITEPREFIX)/man/man1
+INSTALLSITEMAN1DIR = /usr/local/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
-INSTALLVENDORMAN1DIR = $(VENDORPREFIX)/share/man/man1
+INSTALLVENDORMAN1DIR = /usr/share/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
-INSTALLMAN3DIR = $(PERLPREFIX)/share/man/man3
+INSTALLMAN3DIR = /usr/share/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = $(SITEPREFIX)/man/man3
+INSTALLSITEMAN3DIR = /usr/local/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
-INSTALLVENDORMAN3DIR = $(VENDORPREFIX)/share/man/man3
+INSTALLVENDORMAN3DIR = /usr/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB = /usr/share/perl/5.10
 PERL_ARCHLIB = /usr/lib/perl/5.10
@@ -129,12 +128,13 @@ PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"
 FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"
 ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"
 PERL_CORE = 0
+PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/share/perl/5.10/ExtUtils/MakeMaker.pm
-MM_VERSION  = 6.42
-MM_REVISION = 41145
+MAKEMAKER   = /usr/local/share/perl/5.10.0/ExtUtils/MakeMaker.pm
+MM_VERSION  = 6.54
+MM_REVISION = 65400
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -145,7 +145,7 @@ FULLEXT = Data/Type
 BASEEXT = Type
 PARENT_NAME = Data
 DLBASE = $(BASEEXT)
-VERSION_FROM = Type.pm
+VERSION_FROM = lib/Data/Type.pm
 OBJECT = 
 LDFROM = $(OBJECT)
 LINKTYPE = dynamic
@@ -158,8 +158,6 @@ O_FILES  =
 H_FILES  = 
 MAN1PODS = 
 MAN3PODS = README.pod \
-	Type.pm \
-	finalize.pl \
 	lib/Data/Type.pm \
 	lib/Data/Type/Collection.pm \
 	lib/Data/Type/Collection/Bio.pm \
@@ -204,9 +202,7 @@ PERL_ARCHIVE_AFTER =
 
 TO_INST_PM = CPAN-INSTALL.pl \
 	README.pod \
-	Type.pm \
 	benchmark.pl \
-	finalize.pl \
 	lib/Data/Type.pm \
 	lib/Data/Type/Collection.pm \
 	lib/Data/Type/Collection/Bio.pm \
@@ -229,28 +225,24 @@ TO_INST_PM = CPAN-INSTALL.pl \
 	lib/Data/Type/Query.pm \
 	lib/Data/Type/Tied.pm
 
-PM_TO_BLIB = lib/Data/Type/Docs/FOP.pod \
-	blib/lib/Data/Type/Docs/FOP.pod \
-	lib/Data/Type/Collection/W3C.pm \
+PM_TO_BLIB = lib/Data/Type/Collection/W3C.pm \
 	blib/lib/Data/Type/Collection/W3C.pm \
+	lib/Data/Type/Docs/FOP.pod \
+	blib/lib/Data/Type/Docs/FOP.pod \
 	benchmark.pl \
 	$(INST_LIB)/Data/benchmark.pl \
 	lib/Data/Type/Collection/Perl6.pm \
 	blib/lib/Data/Type/Collection/Perl6.pm \
 	lib/Data/Type/Collection/DB.pm \
 	blib/lib/Data/Type/Collection/DB.pm \
-	Type.pm \
-	$(INST_LIB)/Data/Type.pm \
 	lib/Data/Type/Tied.pm \
 	blib/lib/Data/Type/Tied.pm \
-	finalize.pl \
-	$(INST_LIB)/Data/finalize.pl \
 	CPAN-INSTALL.pl \
 	$(INST_LIB)/Data/CPAN-INSTALL.pl \
-	lib/Data/Type/Docs/RFC.pod \
-	blib/lib/Data/Type/Docs/RFC.pod \
 	lib/Data/Type/Collection/Bio.pm \
 	blib/lib/Data/Type/Collection/Bio.pm \
+	lib/Data/Type/Docs/RFC.pod \
+	blib/lib/Data/Type/Docs/RFC.pod \
 	lib/Data/Type/Field.pm \
 	blib/lib/Data/Type/Field.pm \
 	lib/Data/Type/Filter.pm \
@@ -271,20 +263,20 @@ PM_TO_BLIB = lib/Data/Type/Docs/FOP.pod \
 	blib/lib/Data/Type/Guard.pm \
 	lib/Data/Type/Docs/Howto.pod \
 	blib/lib/Data/Type/Docs/Howto.pod \
-	lib/Data/Type.pm \
-	blib/lib/Data/Type.pm \
 	lib/Data/Type/Collection/Std.pm \
 	blib/lib/Data/Type/Collection/Std.pm \
-	lib/Data/Type/Exception.pm \
-	blib/lib/Data/Type/Exception.pm \
+	lib/Data/Type.pm \
+	blib/lib/Data/Type.pm \
 	lib/Data/Type/Docs.pod \
 	blib/lib/Data/Type/Docs.pod \
+	lib/Data/Type/Exception.pm \
+	blib/lib/Data/Type/Exception.pm \
 	lib/Data/Type/Docs/FAQ.pod \
 	blib/lib/Data/Type/Docs/FAQ.pod
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 6.42
+MM_Unix_VERSION = 6.54
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -302,7 +294,7 @@ SHELL = /bin/sh
 CHMOD = chmod
 CP = cp
 MV = mv
-NOOP = $(SHELL) -c true
+NOOP = $(TRUE)
 NOECHO = @
 RM_F = rm -f
 RM_RF = rm -rf
@@ -310,20 +302,22 @@ TEST_F = test -f
 TOUCH = touch
 UMASK_NULL = umask 0
 DEV_NULL = > /dev/null 2>&1
-MKPATH = $(ABSPERLRUN) "-MExtUtils::Command" -e mkpath
-EQUALIZE_TIMESTAMP = $(ABSPERLRUN) "-MExtUtils::Command" -e eqtime
+MKPATH = $(ABSPERLRUN) -MExtUtils::Command -e 'mkpath' --
+EQUALIZE_TIMESTAMP = $(ABSPERLRUN) -MExtUtils::Command -e 'eqtime' --
+FALSE = false
+TRUE = true
 ECHO = echo
 ECHO_N = echo -n
 UNINST = 0
 VERBINST = 0
-MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install({@ARGV}, '\''$(VERBINST)'\'', 0, '\''$(UNINST)'\'');' --
-DOC_INSTALL = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install
-UNINSTALL = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall
-WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist
+MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, verbose => '\''$(VERBINST)'\'', uninstall_shadows => '\''$(UNINST)'\'', dir_mode => '\''$(PERM_DIR)'\'' ]);' --
+DOC_INSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'perllocal_install' --
+UNINSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'uninstall' --
+WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'warn_if_old_packlist' --
 MACROSTART = 
 MACROEND = 
 USEMAKEFILE = -f
-FIXIN = $(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"
+FIXIN = $(ABSPERLRUN) -MExtUtils::MY -e 'MY->fixin(shift)' --
 
 
 # --- MakeMaker makemakerdflt section:
@@ -347,7 +341,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Data-Type
-DISTVNAME = Data-Type-0.02.01
+DISTVNAME = Data-Type-0.02.02
 
 
 # --- MakeMaker macro section:
@@ -419,42 +413,42 @@ blibdirs.ts : blibdirs
 
 $(INST_LIBDIR)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_LIBDIR)
-	$(NOECHO) $(CHMOD) 755 $(INST_LIBDIR)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_LIBDIR)
 	$(NOECHO) $(TOUCH) $(INST_LIBDIR)$(DFSEP).exists
 
 $(INST_ARCHLIB)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_ARCHLIB)
-	$(NOECHO) $(CHMOD) 755 $(INST_ARCHLIB)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_ARCHLIB)
 	$(NOECHO) $(TOUCH) $(INST_ARCHLIB)$(DFSEP).exists
 
 $(INST_AUTODIR)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_AUTODIR)
-	$(NOECHO) $(CHMOD) 755 $(INST_AUTODIR)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_AUTODIR)
 	$(NOECHO) $(TOUCH) $(INST_AUTODIR)$(DFSEP).exists
 
 $(INST_ARCHAUTODIR)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
-	$(NOECHO) $(CHMOD) 755 $(INST_ARCHAUTODIR)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_ARCHAUTODIR)
 	$(NOECHO) $(TOUCH) $(INST_ARCHAUTODIR)$(DFSEP).exists
 
 $(INST_BIN)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_BIN)
-	$(NOECHO) $(CHMOD) 755 $(INST_BIN)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_BIN)
 	$(NOECHO) $(TOUCH) $(INST_BIN)$(DFSEP).exists
 
 $(INST_SCRIPT)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_SCRIPT)
-	$(NOECHO) $(CHMOD) 755 $(INST_SCRIPT)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_SCRIPT)
 	$(NOECHO) $(TOUCH) $(INST_SCRIPT)$(DFSEP).exists
 
 $(INST_MAN1DIR)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_MAN1DIR)
-	$(NOECHO) $(CHMOD) 755 $(INST_MAN1DIR)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_MAN1DIR)
 	$(NOECHO) $(TOUCH) $(INST_MAN1DIR)$(DFSEP).exists
 
 $(INST_MAN3DIR)$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) $(INST_MAN3DIR)
-	$(NOECHO) $(CHMOD) 755 $(INST_MAN3DIR)
+	$(NOECHO) $(CHMOD) $(PERM_DIR) $(INST_MAN3DIR)
 	$(NOECHO) $(TOUCH) $(INST_MAN3DIR)$(DFSEP).exists
 
 
@@ -500,16 +494,14 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all  \
-	lib/Data/Type/Docs/FOP.pod \
 	lib/Data/Type/Collection/W3C.pm \
+	lib/Data/Type/Docs/FOP.pod \
 	lib/Data/Type/Collection/Perl6.pm \
 	lib/Data/Type/Collection/DB.pm \
-	Type.pm \
 	lib/Data/Type/Tied.pm \
-	finalize.pl \
 	lib/Data/Type/Collection/Bio.pm \
-	lib/Data/Type/Field.pm \
 	lib/Data/Type/Docs/RFC.pod \
+	lib/Data/Type/Field.pm \
 	lib/Data/Type/Filter.pm \
 	lib/Data/Type/Collection.pm \
 	README.pod \
@@ -519,22 +511,20 @@ manifypods : pure_all  \
 	lib/Data/Type/Query.pm \
 	lib/Data/Type/Guard.pm \
 	lib/Data/Type/Docs/Howto.pod \
-	lib/Data/Type.pm \
 	lib/Data/Type/Collection/Std.pm \
-	lib/Data/Type/Exception.pm \
+	lib/Data/Type.pm \
 	lib/Data/Type/Docs.pod \
+	lib/Data/Type/Exception.pm \
 	lib/Data/Type/Docs/FAQ.pod
-	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) \
-	  lib/Data/Type/Docs/FOP.pod $(INST_MAN3DIR)/Data::Type::Docs::FOP.$(MAN3EXT) \
+	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) \
 	  lib/Data/Type/Collection/W3C.pm $(INST_MAN3DIR)/Data::Type::Collection::W3C.$(MAN3EXT) \
+	  lib/Data/Type/Docs/FOP.pod $(INST_MAN3DIR)/Data::Type::Docs::FOP.$(MAN3EXT) \
 	  lib/Data/Type/Collection/Perl6.pm $(INST_MAN3DIR)/Data::Type::Collection::Perl6.$(MAN3EXT) \
 	  lib/Data/Type/Collection/DB.pm $(INST_MAN3DIR)/Data::Type::Collection::DB.$(MAN3EXT) \
-	  Type.pm $(INST_MAN3DIR)/Data::Type.$(MAN3EXT) \
 	  lib/Data/Type/Tied.pm $(INST_MAN3DIR)/Data::Type::Tied.$(MAN3EXT) \
-	  finalize.pl $(INST_MAN3DIR)/Data::finalize.$(MAN3EXT) \
 	  lib/Data/Type/Collection/Bio.pm $(INST_MAN3DIR)/Data::Type::Collection::Bio.$(MAN3EXT) \
-	  lib/Data/Type/Field.pm $(INST_MAN3DIR)/Data::Type::Field.$(MAN3EXT) \
 	  lib/Data/Type/Docs/RFC.pod $(INST_MAN3DIR)/Data::Type::Docs::RFC.$(MAN3EXT) \
+	  lib/Data/Type/Field.pm $(INST_MAN3DIR)/Data::Type::Field.$(MAN3EXT) \
 	  lib/Data/Type/Filter.pm $(INST_MAN3DIR)/Data::Type::Filter.$(MAN3EXT) \
 	  lib/Data/Type/Collection.pm $(INST_MAN3DIR)/Data::Type::Collection.$(MAN3EXT) \
 	  README.pod $(INST_MAN3DIR)/Data::README.$(MAN3EXT) \
@@ -544,10 +534,10 @@ manifypods : pure_all  \
 	  lib/Data/Type/Query.pm $(INST_MAN3DIR)/Data::Type::Query.$(MAN3EXT) \
 	  lib/Data/Type/Guard.pm $(INST_MAN3DIR)/Data::Type::Guard.$(MAN3EXT) \
 	  lib/Data/Type/Docs/Howto.pod $(INST_MAN3DIR)/Data::Type::Docs::Howto.$(MAN3EXT) \
-	  lib/Data/Type.pm $(INST_MAN3DIR)/Data::Type.$(MAN3EXT) \
 	  lib/Data/Type/Collection/Std.pm $(INST_MAN3DIR)/Data::Type::Collection::Std.$(MAN3EXT) \
-	  lib/Data/Type/Exception.pm $(INST_MAN3DIR)/Data::Type::Exception.$(MAN3EXT) \
+	  lib/Data/Type.pm $(INST_MAN3DIR)/Data::Type.$(MAN3EXT) \
 	  lib/Data/Type/Docs.pod $(INST_MAN3DIR)/Data::Type::Docs.$(MAN3EXT) \
+	  lib/Data/Type/Exception.pm $(INST_MAN3DIR)/Data::Type::Exception.$(MAN3EXT) \
 	  lib/Data/Type/Docs/FAQ.pod $(INST_MAN3DIR)/Data::Type::Docs::FAQ.$(MAN3EXT) 
 
 
@@ -613,45 +603,53 @@ realclean purge ::  clean realclean_subdirs
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	$(NOECHO) $(ECHO) '--- #YAML:1.0' > META_new.yml
-	$(NOECHO) $(ECHO) 'name:                Data-Type' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version:             0.02.01' >> META_new.yml
-	$(NOECHO) $(ECHO) 'abstract:            robust and extensible data- and valuetype system' >> META_new.yml
-	$(NOECHO) $(ECHO) 'license:             ~' >> META_new.yml
-	$(NOECHO) $(ECHO) 'author:              ' >> META_new.yml
+	$(NOECHO) $(ECHO) 'name:               Data-Type' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version:            0.02.02' >> META_new.yml
+	$(NOECHO) $(ECHO) 'abstract:           robust and extensible data- and valuetype system' >> META_new.yml
+	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - muenalan@cpan.org' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by:        ExtUtils::MakeMaker version 6.42' >> META_new.yml
-	$(NOECHO) $(ECHO) 'distribution_type:   module' >> META_new.yml
-	$(NOECHO) $(ECHO) 'requires:     ' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Attribute::Util:               0.01' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Business::CINS:                1.13' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Business::CreditCard:          0.27' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Business::ISSN:                0.90' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Business::UPC:                 0.04' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Class::Maker:                  0.05.17' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Class::Multimethods:           1.70' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Data::Iter:                    0' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Date::Parse:                   2.27' >> META_new.yml
-	$(NOECHO) $(ECHO) '    DBI:                           1.30' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Email::Valid:                  0.15' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Error:                         0.15' >> META_new.yml
-	$(NOECHO) $(ECHO) '    HTML::Lint:                    1.26' >> META_new.yml
-	$(NOECHO) $(ECHO) '    IO::Extended:                  0.06' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Locale::Language:              2.21' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Locale::SubCountry:            ' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Net::IPv6Addr:                 0.2' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Pod::Find:                     0.24' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Regexp::Box:                   0.01' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Regexp::Common:                2.113' >> META_new.yml
-	$(NOECHO) $(ECHO) '    String::ExpandEscapes:         0.01' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Text::TabularDisplay:          1.18' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Tie::ListKeyedHash:            0.41' >> META_new.yml
-	$(NOECHO) $(ECHO) '    X500::DN:                      0.28' >> META_new.yml
-	$(NOECHO) $(ECHO) '    XML::LibXSLT:                  1.53' >> META_new.yml
-	$(NOECHO) $(ECHO) '    XML::Parser:                   2.34' >> META_new.yml
-	$(NOECHO) $(ECHO) '    XML::Schema:                   0.07' >> META_new.yml
+	$(NOECHO) $(ECHO) 'license:            unknown' >> META_new.yml
+	$(NOECHO) $(ECHO) 'distribution_type:  module' >> META_new.yml
+	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '    ExtUtils::MakeMaker:  0' >> META_new.yml
+	$(NOECHO) $(ECHO) 'build_requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '    ExtUtils::MakeMaker:  0' >> META_new.yml
+	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Attribute::Util:      0.01' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Business::CINS:       1.13' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Business::CreditCard:  0.27' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Business::ISSN:       0.90' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Business::UPC:        0.04' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Class::Maker:         0.05.17' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Class::Multimethods:  1.70' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Data::Iter:           0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Date::Parse:          2.27' >> META_new.yml
+	$(NOECHO) $(ECHO) '    DBI:                  1.30' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Email::Valid:         0.15' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Error:                0.15' >> META_new.yml
+	$(NOECHO) $(ECHO) '    HTML::Lint:           1.26' >> META_new.yml
+	$(NOECHO) $(ECHO) '    IO::Extended:         0.06' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Locale::Language:     2.0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Locale::SubCountry:   ' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Net::IPv6Addr:        0.2' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Pod::Find:            0.24' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Regexp::Box:          0.01' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Regexp::Common:       2.113' >> META_new.yml
+	$(NOECHO) $(ECHO) '    String::ExpandEscapes:  0.01' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Text::TabularDisplay:  1.18' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Tie::ListKeyedHash:   0.41' >> META_new.yml
+	$(NOECHO) $(ECHO) '    X500::DN:             0.28' >> META_new.yml
+	$(NOECHO) $(ECHO) '    XML::LibXSLT:         1.53' >> META_new.yml
+	$(NOECHO) $(ECHO) '    XML::Parser:          2.34' >> META_new.yml
+	$(NOECHO) $(ECHO) '    XML::Schema:          0.07' >> META_new.yml
+	$(NOECHO) $(ECHO) 'no_index:' >> META_new.yml
+	$(NOECHO) $(ECHO) '    directory:' >> META_new.yml
+	$(NOECHO) $(ECHO) '        - t' >> META_new.yml
+	$(NOECHO) $(ECHO) '        - inc' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by:       ExtUtils::MakeMaker version 6.54' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
-	$(NOECHO) $(ECHO) '    url:     http://module-build.sourceforge.net/META-spec-v1.3.html' >> META_new.yml
-	$(NOECHO) $(ECHO) '    version: 1.3' >> META_new.yml
+	$(NOECHO) $(ECHO) '    url:      http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
+	$(NOECHO) $(ECHO) '    version:  1.4' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 
 
@@ -785,7 +783,9 @@ doc__install : doc_site_install
 	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install :: all
-	$(NOECHO) umask 022; $(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
+		read $(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist \
+		write $(DESTINSTALLARCHLIB)/auto/$(FULLEXT)/.packlist \
 		$(INST_LIB) $(DESTINSTALLPRIVLIB) \
 		$(INST_ARCHLIB) $(DESTINSTALLARCHLIB) \
 		$(INST_BIN) $(DESTINSTALLBIN) \
@@ -797,7 +797,7 @@ pure_perl_install :: all
 
 
 pure_site_install :: all
-	$(NOECHO) umask 02; $(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
 		read $(SITEARCHEXP)/auto/$(FULLEXT)/.packlist \
 		write $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist \
 		$(INST_LIB) $(DESTINSTALLSITELIB) \
@@ -810,7 +810,9 @@ pure_site_install :: all
 		$(PERL_ARCHLIB)/auto/$(FULLEXT)
 
 pure_vendor_install :: all
-	$(NOECHO) umask 022; $(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
+		read $(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist \
+		write $(DESTINSTALLVENDORARCH)/auto/$(FULLEXT)/.packlist \
 		$(INST_LIB) $(DESTINSTALLVENDORLIB) \
 		$(INST_ARCHLIB) $(DESTINSTALLVENDORARCH) \
 		$(INST_BIN) $(DESTINSTALLVENDORBIN) \
@@ -819,31 +821,50 @@ pure_vendor_install :: all
 		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
 
 doc_perl_install :: all
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
+		"Module" "$(NAME)" \
+		"installed into" "$(INSTALLPRIVLIB)" \
+		LINKTYPE "$(LINKTYPE)" \
+		VERSION "$(VERSION)" \
+		EXE_FILES "$(EXE_FILES)" \
+		>> $(DESTINSTALLARCHLIB)/perllocal.pod
 
 doc_site_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLSITEARCH)/perllocal.pod
-	-$(NOECHO) umask 02; $(MKPATH) $(DESTINSTALLSITEARCH)
-	-$(NOECHO) umask 02; $(DOC_INSTALL) \
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> $(DESTINSTALLSITEARCH)/perllocal.pod
+		>> $(DESTINSTALLARCHLIB)/perllocal.pod
 
 doc_vendor_install :: all
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
+		"Module" "$(NAME)" \
+		"installed into" "$(INSTALLVENDORLIB)" \
+		LINKTYPE "$(LINKTYPE)" \
+		VERSION "$(VERSION)" \
+		EXE_FILES "$(EXE_FILES)" \
+		>> $(DESTINSTALLARCHLIB)/perllocal.pod
 
 
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
+	$(NOECHO) $(UNINSTALL) $(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) $(SITEARCHEXP)/auto/$(FULLEXT)/.packlist
 
 uninstall_from_vendordirs ::
-
+	$(NOECHO) $(UNINSTALL) $(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist
 
 
 # --- MakeMaker force section:
@@ -867,7 +888,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(PERLRUN) Makefile.PL 
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) $(ECHO) "==> Please rerun the $(MAKE) command.  <=="
-	false
+	$(FALSE)
 
 
 
@@ -920,40 +941,38 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,02,01,0">' > $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    <TITLE>$(DISTNAME)</TITLE>' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.02.02">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>robust and extensible data- and valuetype system</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>muenalan@cpan.org</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Attribute-Util" VERSION="0,01,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Business-CINS" VERSION="1,13,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Business-CreditCard" VERSION="0,27,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Business-ISSN" VERSION="0,90,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Business-UPC" VERSION="0,04,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Class-Maker" VERSION="0,05,17,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Class-Multimethods" VERSION="1,70,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="DBI" VERSION="1,30,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Data-Iter" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Date-Parse" VERSION="2,27,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Email-Valid" VERSION="0,15,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Error" VERSION="0,15,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTML-Lint" VERSION="1,26,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="IO-Extended" VERSION="0,06,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Locale-Language" VERSION="2,21,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Locale-SubCountry" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Net-IPv6Addr" VERSION="0,2,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Pod-Find" VERSION="0,24,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Regexp-Box" VERSION="0,01,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Regexp-Common" VERSION="2,113,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="String-ExpandEscapes" VERSION="0,01,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Text-TabularDisplay" VERSION="1,18,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Tie-ListKeyedHash" VERSION="0,41,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="X500-DN" VERSION="0,28,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="XML-LibXSLT" VERSION="1,53,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="XML-Parser" VERSION="2,34,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="XML-Schema" VERSION="0,07,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <OS NAME="$(OSNAME)" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="i486-linux-gnu-thread-multi-5.1" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Attribute::Util" VERSION="0.01" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Business::CINS" VERSION="1.13" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Business::CreditCard" VERSION="0.27" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Business::ISSN" VERSION="0.9" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Business::UPC" VERSION="0.04" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Class::Maker" VERSION="0.05" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Class::Multimethods" VERSION="1.7" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="DBI::" VERSION="1.3" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Data::Iter" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Date::Parse" VERSION="2.27" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Email::Valid" VERSION="0.15" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Error::" VERSION="0.15" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTML::Lint" VERSION="1.26" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="IO::Extended" VERSION="0.06" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Locale::Language" VERSION="2" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Locale::SubCountry" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::IPv6Addr" VERSION="0.2" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Pod::Find" VERSION="0.24" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Regexp::Box" VERSION="0.01" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Regexp::Common" VERSION="2.113" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="String::ExpandEscapes" VERSION="0.01" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Text::TabularDisplay" VERSION="1.18" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Tie::ListKeyedHash" VERSION="0.41" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="X500::DN" VERSION="0.28" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XML::LibXSLT" VERSION="1.53" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XML::Parser" VERSION="2.34" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XML::Schema" VERSION="0.07" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.10" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> $(DISTNAME).ppd
@@ -961,19 +980,17 @@ ppd :
 
 # --- MakeMaker pm_to_blib section:
 
-pm_to_blib : $(TO_INST_PM)
-	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', '\''$(PM_FILTER)'\'')' -- \
-	  lib/Data/Type/Docs/FOP.pod blib/lib/Data/Type/Docs/FOP.pod \
+pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
+	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  lib/Data/Type/Collection/W3C.pm blib/lib/Data/Type/Collection/W3C.pm \
+	  lib/Data/Type/Docs/FOP.pod blib/lib/Data/Type/Docs/FOP.pod \
 	  benchmark.pl $(INST_LIB)/Data/benchmark.pl \
 	  lib/Data/Type/Collection/Perl6.pm blib/lib/Data/Type/Collection/Perl6.pm \
 	  lib/Data/Type/Collection/DB.pm blib/lib/Data/Type/Collection/DB.pm \
-	  Type.pm $(INST_LIB)/Data/Type.pm \
 	  lib/Data/Type/Tied.pm blib/lib/Data/Type/Tied.pm \
-	  finalize.pl $(INST_LIB)/Data/finalize.pl \
 	  CPAN-INSTALL.pl $(INST_LIB)/Data/CPAN-INSTALL.pl \
-	  lib/Data/Type/Docs/RFC.pod blib/lib/Data/Type/Docs/RFC.pod \
 	  lib/Data/Type/Collection/Bio.pm blib/lib/Data/Type/Collection/Bio.pm \
+	  lib/Data/Type/Docs/RFC.pod blib/lib/Data/Type/Docs/RFC.pod \
 	  lib/Data/Type/Field.pm blib/lib/Data/Type/Field.pm \
 	  lib/Data/Type/Filter.pm blib/lib/Data/Type/Filter.pm \
 	  lib/Data/Type/Collection.pm blib/lib/Data/Type/Collection.pm \
@@ -984,10 +1001,10 @@ pm_to_blib : $(TO_INST_PM)
 	  lib/Data/Type/Query.pm blib/lib/Data/Type/Query.pm \
 	  lib/Data/Type/Guard.pm blib/lib/Data/Type/Guard.pm \
 	  lib/Data/Type/Docs/Howto.pod blib/lib/Data/Type/Docs/Howto.pod \
-	  lib/Data/Type.pm blib/lib/Data/Type.pm \
 	  lib/Data/Type/Collection/Std.pm blib/lib/Data/Type/Collection/Std.pm \
-	  lib/Data/Type/Exception.pm blib/lib/Data/Type/Exception.pm \
+	  lib/Data/Type.pm blib/lib/Data/Type.pm \
 	  lib/Data/Type/Docs.pod blib/lib/Data/Type/Docs.pod \
+	  lib/Data/Type/Exception.pm blib/lib/Data/Type/Exception.pm \
 	  lib/Data/Type/Docs/FAQ.pod blib/lib/Data/Type/Docs/FAQ.pod 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
